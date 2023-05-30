@@ -1,7 +1,13 @@
-const express = require("express")
-const bcrypt = require('bcrypt')
-const { BCRYPT_WORK_FACTOR } = require('../config')
+const jwt = require("jsonwebtoken");
+const { SECRET_KEY } = require("../config");
 
-async function generateToken(username, password) {
-
+function generateToken(id, role) {
+    let payload = {
+        id: id,
+        role: role
+    }
+    console.log(id, role)
+    return jwt.sign(payload, SECRET_KEY)
 }
+
+module.exports = { generateToken }

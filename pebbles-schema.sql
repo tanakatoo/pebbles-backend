@@ -53,13 +53,13 @@ CREATE TABLE users(
     email TEXT NOT NULL
         CHECK (position('@' IN email) > 1),
     role VARCHAR(20) NOT NULL DEFAULT 'regular',
-    sign_up_date DATE NOT NULL,
-    last_login_date DATE NOT NULL,
+    sign_up_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    last_login_date DATE NOT NULL DEFAULT CURRENT_DATE,
     country_id INTEGER REFERENCES countries(id) ON DELETE SET NULL,
     city_id INTEGER REFERENCES countries(id) ON DELETE SET NULL,
     state_id INTEGER REFERENCES countries(id) ON DELETE SET NULL,
     timezone_id INTEGER REFERENCES timezones(id) ON DELETE SET NULL,
-    language_preference VARCHAR(2) NOT NULL,
+    language_preference VARCHAR(2) NOT NULL DEFAULT 'en',
     age_range_id INTEGER REFERENCES age_ranges(id) ON DELETE SET NULL,
     gender_id INTEGER REFERENCES genders(id) ON DELETE SET NULL
 );

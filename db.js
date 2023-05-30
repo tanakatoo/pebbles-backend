@@ -9,6 +9,7 @@ if (process.env.NODE_ENV === "production") {
             rejectUnauthorized: false
         }
     });
+
 } else {
     db = new Client({
         connectionString: getDatabaseUri()
