@@ -21,13 +21,15 @@ router.post('/login', async (req, res, next) => {
             const errs = validator.errors.map(e => e.stack)
             throw new BadRequestError(errs)
         }
-        const { identifier, password } = req.body
+        const { username, password } = req.body
         //see if identifier is an email
         let user
-        if (validatorPkg.isEmail(identifier)) {
-            user = await User.login(null, identifier, password)
+        if (validatorPkg.isEmail(username)) {
+            console.log('it is a email')
+            user = await User.login(null, username, password)
         } else {
-            user = await User.login(identifier, null, password)
+            console.log('itis an username')
+            user = await User.login(username, null, password)
         }
         //return token
         const token = generateToken(user.id, user.role)

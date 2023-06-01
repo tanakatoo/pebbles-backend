@@ -76,7 +76,7 @@ class User {
                WHERE ${query} = $1`,
             [queryData],
         );
-
+        console.log('got result', result.rows)
         const user = result.rows[0];
 
         if (user) {
