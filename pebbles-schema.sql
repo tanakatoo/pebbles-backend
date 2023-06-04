@@ -26,7 +26,7 @@ CREATE TABLE timezones(
 
 CREATE TABLE age_ranges(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(5) UNIQUE NOT NULL
+    name VARCHAR(20) UNIQUE NOT NULL
 );
 
 CREATE TABLE genders(
@@ -41,6 +41,42 @@ CREATE TABLE premium_accts(
   join_date DATE NOT NULL,
   end_date DATE,
   raz_reading_level VARCHAR(20)
+);
+
+CREATE TABLE goals(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE goals_users(
+    goal_id INTEGER  NOT NULL,
+    user_id INTEGER  NOT NULL,
+    PRIMARY KEY (goal_id, user_id)
+);
+
+CREATE TABLE motivation_levels(
+    id SERIAL PRIMARY KEY,
+    name varchar(50) NOT NULL
+);
+
+CREATE TABLE study_time(
+    id SERIAL PRIMARY KEY,
+    name varchar(50) NOT NULL
+);
+
+CREATE TABLE study_buddy_types(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE languages(
+    id SERIAL PRIMARY KEY,
+    name varchar(50) NOT NULL
+);
+
+CREATE TABLE language_levels(
+    id SERIAL PRIMARY KEY,
+    name varchar(50) NOT NULL
 );
 
 CREATE TABLE users(
@@ -58,13 +94,21 @@ CREATE TABLE users(
     country_id INTEGER REFERENCES countries(id) ON DELETE SET NULL,
     city_id INTEGER REFERENCES countries(id) ON DELETE SET NULL,
     state_id INTEGER REFERENCES countries(id) ON DELETE SET NULL,
-    timezone_id INTEGER REFERENCES timezones(id) ON DELETE SET NULL,
-    language_preference VARCHAR(2) NOT NULL DEFAULT 'en',
-    age_range_id INTEGER REFERENCES age_ranges(id) ON DELETE SET NULL,
-    gender_id INTEGER REFERENCES genders(id) ON DELETE SET NULL
+    language_preference VARCHAR(2) NOT NULL DEFAULT 'JA',
+    gender_id INTEGER REFERENCES genders(id) ON DELETE SET NULL,
+    about TEXT,
+    myway_habits TEXT,
+    myway_motivation_level_id INTEGER REFERENCES motivation_levels(id) ON DELETE SET NULL,
+    myway_study_time_id INTEGER REFERENCES study_time(id) ON DELETE SET NULL,
+    study_buddy_bio TEXT,
+    study_buddy_type_id INTEGER REFERENCES study_buddy_types(id) ON DELETE SET NULL,
+    study_buddy_native_language_id INTEGER REFERENCES languages(id) ON DELETE SET NULL,
+    study_buddy_learning_language_id INTEGER REFERENCES languages(id) ON DELETE SET NULL,
+    study_buddy_language_level_id INTEGER REFERENCES language_levels(id) ON DELETE SET NULL,
+    study_buddy_timezone_id INTEGER REFERENCES timezones(id) ON DELETE SET NULL,
+    study_buddy_age_range_id INTEGER REFERENCES age_ranges(id) ON DELETE SET NULL,
+    study_buddy_active BOOLEAN NOT NULL DEFAULT false
 );
-
-
 
 CREATE TABLE sub_accts(
   id SERIAL PRIMARY KEY,

@@ -1,14 +1,12 @@
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 
-function generateToken(id, role) {
+function generateToken(id, username, role) {
     let payload = {
         id: id,
+        username: username,
         role: role
     }
-    console.log(id, role)
-    console.log('secret key is', SECRET_KEY)
-    console.log(jwt.sign(payload, SECRET_KEY))
     return jwt.sign(payload, SECRET_KEY)
 }
 

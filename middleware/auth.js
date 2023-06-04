@@ -4,20 +4,22 @@
 
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
-const { UnauthorizedError } = require("../expressError");
+const { UnauthorizedError } = require("../error");
 
 
 /** Middleware: Authenticate user.
  *
- * If a token was provided, verify it, and, if valid, store the token payload
- * on res.locals (this will include the username and isAdmin field.)
+ * If a token was provided in the header, verify it, and, if valid, store the token res.locals.user
+ * on res.locals (this will include user id and role
  *
- * It's not an error if no token was provided or if the token is not valid.
+ * It's not an error if no token was provided or if the token is not valid. 
+ * It just means user is not logged in
  */
 
 function authenticateJWT(req, res, next) {
     try {
         const authHeader = req.headers && req.headers.authorization;
+
         if (authHeader) {
             const token = authHeader.replace(/^[Bb]earer /, "").trim();
             res.locals.user = jwt.verify(token, SECRET_KEY);
@@ -28,14 +30,19 @@ function authenticateJWT(req, res, next) {
     }
 }
 
-/** Middleware to use when they must be logged in.
+/** Middleware to use to check if they are logged in
  *
  * If not, raises Unauthorized.
  */
 
-function ensureLoggedIn(req, res, next) {
+function isLoggedIn(req, res, next) {
     try {
-        if (!res.locals.user) throw new UnauthorizedError();
+        if (!res.locals.user) {
+            req.loggedIn = false
+
+        } else {
+            req.loggedIn = true
+        }
         return next();
     } catch (err) {
         return next(err);
@@ -65,11 +72,15 @@ function ensureAdmin(req, res, next) {
  *  If not, raises Unauthorized.
  */
 
-function ensureCorrectUserOrAdmin(req, res, next) {
+function isCorrectUserOrAdmin(req, res, next) {
     try {
         const user = res.locals.user;
-        if (!(user && (user.isAdmin || user.username === req.params.username))) {
-            throw new UnauthorizedError();
+        console.log(user)
+        if (!(user && (user.role === "admin" || user.username === req.params.username))) {
+            // throw new UnauthorizedError();
+            req.correctUser = false
+        } else {
+            req.correctUser = true
         }
         return next();
     } catch (err) {
@@ -77,10 +88,14 @@ function ensureCorrectUserOrAdmin(req, res, next) {
     }
 }
 
+/*See if token is the same as the user being requested 
+token provided 
+*/
+
 
 module.exports = {
     authenticateJWT,
-    ensureLoggedIn,
+    isLoggedIn,
     ensureAdmin,
-    ensureCorrectUserOrAdmin,
+    isCorrectUserOrAdmin,
 };

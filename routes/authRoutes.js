@@ -25,31 +25,22 @@ router.post('/login', async (req, res, next) => {
         //see if identifier is an email
         let user
         if (validatorPkg.isEmail(username)) {
-            console.log('it is a email')
             user = await User.login(null, username, password)
         } else {
-            console.log('itis an username')
             user = await User.login(username, null, password)
         }
         //return token
-        const token = generateToken(user.id, user.role)
+        const token = generateToken(user.id, user.username, user.role)
         return res.status(201).json(token)
     } catch (e) {
-        next(e)
+        return next(e)
     }
 });
 
-// router.get('/login/google', passport.authenticate('google'));
-
-/*
-registers new user
-parameters: 
-*/
 
 router.post('/register', async (req, res, next) => {
     try {
         //validate data
-
         const validator = jsonschema.validate(req.body, userRegisterSchema)
         if (!validator.valid) {
 
@@ -58,7 +49,7 @@ router.post('/register', async (req, res, next) => {
         }
 
         const newUser = await User.register({ ...req.body })
-        const token = generateToken(newUser.id, newUser.role)
+        const token = generateToken(newUser.id, newUser.username, newUser.role)
         console.log('registered', newUser, token)
         return res.status(201).json(token)
     } catch (e) {

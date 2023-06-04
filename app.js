@@ -17,11 +17,6 @@ app.get('./favicon.ico', (req, res) => {
     res.sendStatus(204)
 })
 
-app.use('/', (req, res) => {
-    res.send('hello')
-}
-)
-
 //this is the 404, so this is hit if none of the other routes are hit
 app.use((req, res, next) => {
     const e = new ExpressError.NotFoundError()
