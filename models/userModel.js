@@ -4,7 +4,7 @@
 
 const db = require("../db");
 const bcrypt = require("bcrypt");
-const userErrors = require('../json/userErrors.json')
+// const userErrors = require('../json/userErrors.json')
 const { BCRYPT_WORK_FACTOR } = require('../config')
 // const { sqlForPartialUpdate } = require("../helpers/sql");
 const {
@@ -34,7 +34,7 @@ class User {
         );
         if (checkDuplicateEmail.rows[0]) {
 
-            throw new BadRequestError(userErrors.duplicateEmail);
+            throw new BadRequestError("duplicateEmail");
         }
         //check if username is already used
         const checkDuplicateUsername = await db.query(

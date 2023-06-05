@@ -31,8 +31,7 @@ CREATE TABLE age_ranges(
 
 CREATE TABLE genders(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(20) UNIQUE NOT NULL,
-    lang VARCHAR(2) NOT NULL
+    name VARCHAR(20) UNIQUE NOT NULL
 );
 
 /* list of all the premium accounts*/
@@ -45,7 +44,8 @@ CREATE TABLE premium_accts(
 
 CREATE TABLE goals(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
+    name VARCHAR(50) NOT NULL,
+    lang VARCHAR(2) NOT NULL
 );
 
 CREATE TABLE goals_users(
@@ -56,27 +56,33 @@ CREATE TABLE goals_users(
 
 CREATE TABLE motivation_levels(
     id SERIAL PRIMARY KEY,
-    name varchar(50) NOT NULL
+    name varchar(50) NOT NULL,
+    lang VARCHAR(2) NOT NULL
 );
 
 CREATE TABLE study_time(
     id SERIAL PRIMARY KEY,
-    name varchar(50) NOT NULL
+    name varchar(50) NOT NULL,
+    lang VARCHAR(2) NOT NULL
+
 );
 
 CREATE TABLE study_buddy_types(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
+    name VARCHAR(50) NOT NULL,lang VARCHAR(2) NOT NULL
+
 );
 
 CREATE TABLE languages(
     id SERIAL PRIMARY KEY,
-    name varchar(50) NOT NULL
+    name varchar(50) NOT NULL,
+    lang VARCHAR(2) NOT NULL
 );
 
 CREATE TABLE language_levels(
     id SERIAL PRIMARY KEY,
-    name varchar(50) NOT NULL
+    name varchar(50) NOT NULL,
+    lang VARCHAR(2) NOT NULL
 );
 
 CREATE TABLE users(

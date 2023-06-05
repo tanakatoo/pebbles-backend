@@ -12,11 +12,11 @@ const User = require('../models/userModel')
 router.get('/:username', authenticateJWT, isLoggedIn, isCorrectUserOrAdmin, async (req, res, next) => {
 
     try {
-        const isLoggedIn = req.loggedIn
+        const loggedIn = req.loggedIn
         const isCorrectUser = req.correctUser
         const username = req.params.username
 
-        if (isLoggedIn && isCorrectUser) {
+        if (loggedIn && isCorrectUser) {
             //user is logged in and accessing their own profile
             console.log('loggeed in and correct user')
             userData = await User.getPrivate(username)
@@ -25,7 +25,7 @@ router.get('/:username', authenticateJWT, isLoggedIn, isCorrectUserOrAdmin, asyn
             //user is logged in or not but accessing someone else's profile
             userData = await User.getPublic(username)
         }
-        return res.status(200).json({ ...userData, isLoggedIn: isLoggedIn, isCorrectUser: isCorrectUser })
+        return res.status(200).json({ ...userData })
 
     } catch (e) {
         return next(e)

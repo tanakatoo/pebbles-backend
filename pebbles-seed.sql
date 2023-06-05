@@ -33,8 +33,8 @@ VALUES ('Los Angeles (UTC-7)','EN'),
 ('シドニー (UTC+10)','JA');
 
 
-INSERT INTO genders(name, lang)
-VALUES ('male','EN'),('female','EN'),('other','EN'),('男性','JA'),('女性','JA'),('その他','JA');
+INSERT INTO genders(name)
+VALUES ('male'),('female'),('other');
 
 INSERT INTO age_ranges(name)
 VALUES ('18 - 25'),('26 - 35'),('36 - 45'),('46 - 59'),('60+');
@@ -43,19 +43,19 @@ INSERT INTO users(username, password,email,role,sign_up_date,last_login_date,lan
 VALUES ('ktoo','password','karmen.tanaka@gmail.com','admin','2023-05-01','2023-05-01','EN',1);
 
 INSERT INTO goals(name, lang)
-VALUES ('Vocabulary', 'EN'),('Pronunciation', 'EN'),('Listening', 'EN'),('Writing', 'EN'),('Speaking', 'EN'),('語彙', 'JA'),('発音', 'JA'),('リスニング', 'JA'),('書く', 'JA'),('スピーキング', 'JA')
+VALUES ('Vocabulary', 'EN'),('Pronunciation', 'EN'),('Listening', 'EN'),('Writing', 'EN'),('Speaking', 'EN'),('語彙', 'JA'),('発音', 'JA'),('リスニング', 'JA'),('書く', 'JA'),('スピーキング', 'JA');
 
 INSERT INTO motivation_levels(name, lang)
-VALUES ('English', 'EN'),('Japanese','JA'),('英語', 'EN'),('日本語','JA')
+VALUES ('English', 'EN'),('Japanese','JA'),('英語', 'EN'),('日本語','JA');
 
 INSERT INTO study_time(name, lang)
-VALUES ('Everyday', 'EN'),('3 times a week', 'EN'),('Once a week', 'EN'),('Not frequent', 'EN'),('Never', 'EN'),('毎日', 'JA'),('週３', 'JA'),('週1', 'JA'),('あまりできない', 'JA'),('まったく', 'JA'),
+VALUES ('Everyday', 'EN'),('3 times a week', 'EN'),('Once a week', 'EN'),('Not frequent', 'EN'),('Never', 'EN'),('毎日', 'JA'),('週３', 'JA'),('週1', 'JA'),('あまりできない', 'JA'),('まったく', 'JA');
 
 INSERT INTO study_buddy_types(name, lang)
-VALUES ('Study buddy','EN'),('Language exchange', 'EN'),('Volunteer','EN'),('一緒に学習','JA'),('言語交換', 'JA'),('ボランティア','JA')
+VALUES ('Study buddy','EN'),('Language exchange', 'EN'),('Volunteer','EN'),('一緒に学習','JA'),('言語交換', 'JA'),('ボランティア','JA');
 
 INSERT INTO languages(name, lang)
-VALUES ('English', 'EN'),('Japanese','JA'),('英語', 'JA'),('日本語','JA')
+VALUES ('English', 'EN'),('Japanese','JA'),('英語', 'JA'),('日本語','JA');
 
 INSERT INTO language_levels(name, lang)
-VALUES ('Beginner','EN'),('Intermediate','EN'),('Advanced','EN'),('初心者','JA'),('中級者','JA'),('上級者','JA')
+VALUES ('Beginner','EN'),('Intermediate','EN'),('Advanced','EN'),('初心者','JA'),('中級者','JA'),('上級者','JA');
