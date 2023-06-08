@@ -92,6 +92,6 @@ router.get('/select-location', async (req, res, next) => {
     }
 })
 //get places id and get full address to save 
-//https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJsU7_xMfKQ4gReI89RJn0-RQ&fields=address_component&language=JA&key=AIzaSyCOUub7PCYSsKR5qBIgggyXL2Yg9u1j3GQ
+//https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJsU7_xMfKQ4gReI89RJn0-RQ&fields=address_component&language=JA&key=
 
 module.exports = router;
