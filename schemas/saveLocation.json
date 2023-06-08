@@ -1,0 +1,21 @@
+{
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "userId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "userId"
+    ]
+  }
+  

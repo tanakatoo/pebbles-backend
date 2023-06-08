@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@mailchimp/mailchimp_transactional": "^1.0.50",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
@@ -24,6 +25,7 @@
     "pg": "^8.11.0",
     "react-redux": "^8.0.5",
     "uuid": "^9.0.0",
-    "validator": "^13.9.0"
+    "validator": "^13.9.0",
+    "zeptomail": "^3.0.4"
   }
 }

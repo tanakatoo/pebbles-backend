@@ -2,26 +2,29 @@
 
 CREATE TABLE countries(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL,
-    lang VARCHAR(2) NOT NULL
-);
-
-CREATE TABLE cities(
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL,
-    lang VARCHAR(2) NOT NULL
+    name_en VARCHAR(100) UNIQUE NOT NULL,
+    name_ja VARCHAR(100) UNIQUE NOT NULL
 );
 
 CREATE TABLE states(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL,
-    lang VARCHAR(2) NOT NULL
+    name_en VARCHAR(100) UNIQUE NOT NULL,
+    name_ja VARCHAR(100) UNIQUE NOT NULL,
+    country_id INTEGER REFERENCES countries(id) ON DELETE SET NULL
 );
+
+
+CREATE TABLE cities(
+    id SERIAL PRIMARY KEY,
+    name_en VARCHAR(100) UNIQUE NOT NULL,
+    name_ja VARCHAR(100) UNIQUE NOT NULL,
+    state_id INTEGER REFERENCES states(id) ON DELETE SET NULL
+);
+
 
 CREATE TABLE timezones(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(50) UNIQUE NOT NULL,
-    lang VARCHAR(2) NOT NULL
+    name VARCHAR(50) UNIQUE NOT NULL
 );
 
 CREATE TABLE age_ranges(
@@ -44,8 +47,7 @@ CREATE TABLE premium_accts(
 
 CREATE TABLE goals(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    lang VARCHAR(2) NOT NULL
+    name VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE goals_users(
@@ -56,33 +58,27 @@ CREATE TABLE goals_users(
 
 CREATE TABLE motivation_levels(
     id SERIAL PRIMARY KEY,
-    name varchar(50) NOT NULL,
-    lang VARCHAR(2) NOT NULL
+    name varchar(50) NOT NULL
 );
 
 CREATE TABLE study_time(
     id SERIAL PRIMARY KEY,
-    name varchar(50) NOT NULL,
-    lang VARCHAR(2) NOT NULL
-
+    name varchar(50) NOT NULL
 );
 
 CREATE TABLE study_buddy_types(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,lang VARCHAR(2) NOT NULL
-
+    name VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE languages(
     id SERIAL PRIMARY KEY,
-    name varchar(50) NOT NULL,
-    lang VARCHAR(2) NOT NULL
+    name varchar(50) NOT NULL
 );
 
 CREATE TABLE language_levels(
     id SERIAL PRIMARY KEY,
-    name varchar(50) NOT NULL,
-    lang VARCHAR(2) NOT NULL
+    name varchar(50) NOT NULL
 );
 
 CREATE TABLE users(
@@ -100,7 +96,7 @@ CREATE TABLE users(
     country_id INTEGER REFERENCES countries(id) ON DELETE SET NULL,
     city_id INTEGER REFERENCES countries(id) ON DELETE SET NULL,
     state_id INTEGER REFERENCES countries(id) ON DELETE SET NULL,
-    language_preference VARCHAR(2) NOT NULL DEFAULT 'JA',
+    language_preference INTEGER REFERENCES languages(id) ON DELETE SET NULL,
     gender_id INTEGER REFERENCES genders(id) ON DELETE SET NULL,
     about TEXT,
     myway_habits TEXT,

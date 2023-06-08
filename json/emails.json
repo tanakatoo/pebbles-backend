@@ -1,0 +1,21 @@
+{
+    "REGISTERED":{
+        "EN":"You are registered",
+        "JA":"Jap you are registered"
+    },
+    "PASSWORD_RESET":{
+        "EN":{
+            "SUBJECT":"Password reset",
+            "BODY":"Here is your password reset link. Click on it and it will take you to reset your password",
+            "BUTTON":"Reset"
+        },
+        "JA":{
+            "SUBJECT":"Jap Password reset",
+            "BODY": "Jap Here is your password reset link. Click on it and it will take you to reset your password",
+            "BUTTON":"Jap Reset"
+            
+        }
+       
+        
+    }
+}

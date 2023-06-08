@@ -10,4 +10,11 @@ function generateToken(id, username, role) {
     return jwt.sign(payload, SECRET_KEY)
 }
 
-module.exports = { generateToken }
+function generateForgotPasswordToken(id) {
+    let payload = {
+        id: id
+    }
+    return jwt.sign(payload, SECRET_KEY, { expiresIn: '15m' })
+}
+
+module.exports = { generateToken, generateForgotPasswordToken }

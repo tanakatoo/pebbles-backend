@@ -18,9 +18,7 @@ router.get('/:username', authenticateJWT, isLoggedIn, isCorrectUserOrAdmin, asyn
 
         if (loggedIn && isCorrectUser) {
             //user is logged in and accessing their own profile
-            console.log('loggeed in and correct user')
             userData = await User.getPrivate(username)
-            console.log('logged in is', req.loggedIn, 'params is', req.params.username, 'correct user is', req.correctUser)
         } else {
             //user is logged in or not but accessing someone else's profile
             userData = await User.getPublic(username)

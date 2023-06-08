@@ -12,6 +12,7 @@ const {
     BadRequestError,
     UnauthorizedError,
 } = require("../error");
+const { use } = require("passport");
 
 
 class User {
@@ -34,7 +35,7 @@ class User {
         );
         if (checkDuplicateEmail.rows[0]) {
 
-            throw new BadRequestError("duplicateEmail");
+            throw new BadRequestError("DUPLICATE_EMAIL");
         }
         //check if username is already used
         const checkDuplicateUsername = await db.query(
@@ -45,7 +46,7 @@ class User {
         );
         if (checkDuplicateUsername.rows[0]) {
 
-            throw new BadRequestError(userErrors.usernameTaken);
+            throw new BadRequestError("USERNAME_TAKEN");
         }
 
         const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
@@ -81,11 +82,53 @@ class User {
         const query = username ? 'username' : 'email'
         const queryData = username ? username : email
         const result = await db.query(
-            `SELECT id,username,
-                      password,
-                      email,
-                      role
-               FROM users
+            `SELECT u.id,
+            u.username,
+            u.password,
+            u.first_name,
+            u.last_name,
+            u.email,
+            u.role,
+            u.sign_up_date,
+            u.last_login_date,
+            l3.name as language_preference,
+            c.name_en as country_en,
+            c.name_ja as country_ja,
+            cities.name_en as city_en,
+            cities.name_ja as city_ja,
+            states.name_en as state_en,
+            states.name_ja as state_ja,
+            genders.name as gender,
+            u.about,
+            u.myway_habits,
+            ml.name as motivational_level,
+            st.name as study_time,
+            pa.join_date as premium_join_date,
+            pa.end_date as premium_end_date,
+            pa.raz_reading_level,
+            u.study_buddy_bio,
+            sbt.name as study_buddy_type,
+            l.name as native_language,
+            l2.name as learning_language,
+            ll.name as language_level,
+            tz.name as time_zone,
+            a.name as age_range,
+            u.study_buddy_active
+            FROM users u
+            LEFT JOIN countries c on c.id=u.country_id
+            LEFT JOIN cities on cities.id=u.city_id
+            LEFT JOIN states on states.id=u.state_id
+            LEFT JOIN genders on genders.id=u.gender_id
+            LEFT JOIN study_buddy_types sbt on sbt.id=u.study_buddy_type_id
+            LEFT JOIN languages l3 on l3.id=u.language_preference
+            LEFT JOIN languages l on l.id=u.study_buddy_native_language_id
+            LEFT JOIN languages l2 on l2.id=u.study_buddy_learning_language_id
+            LEFT JOIN language_levels ll on ll.id=u.study_buddy_language_level_id
+            LEFT JOIN timezones tz on tz.id=u.study_buddy_timezone_id
+            LEFT JOIN age_ranges a on a.id=u.study_buddy_age_range_id
+            LEFT JOIN premium_accts pa on pa.id=u.premium_acct_id
+            LEFT JOIN motivation_levels ml on ml.id=u.myway_motivation_level_id
+            LEFT JOIN study_time st on st.id=u.myway_study_time_id
                WHERE ${query} = $1`,
             [queryData],
         );
@@ -101,7 +144,23 @@ class User {
             }
         }
 
-        throw new UnauthorizedError(userErrors.invalidCredentials);
+        throw new UnauthorizedError('INVALID_CREDENTIALS');
+    }
+
+    static async findUser(username = null, email = null) {
+        // try to find the user
+        const query = username ? 'username' : 'email'
+        const queryData = username ? username : email
+        const result = await db.query(
+            `SELECT username,email
+               FROM users
+               WHERE ${query} = $1`,
+            [queryData],
+        );
+        console.log('got result', result.rows)
+        const user = result.rows[0];
+        return user;
+
     }
     // /** Find all users.
     //  *
@@ -131,17 +190,61 @@ class User {
      **/
 
     static async getPrivate(username) {
-        console.log('username is', username)
+
         const userRes = await db.query(
-            `SELECT *
-           FROM users
-           WHERE username = $1`,
+            `SELECT u.id,
+                u.username,
+                u.first_name,
+                u.last_name,
+                u.email,
+                u.role,
+                u.sign_up_date,
+                u.last_login_date,
+                l3.name as language_preference,
+                c.name_en as country_en,
+                c.name_ja as country_ja,
+                cities.name_en as city_en,
+                cities.name_ja as city_ja,
+                states.name_en as state_en,
+                states.name_ja as state_ja,
+                genders.name as gender,
+                u.about,
+                u.myway_habits,
+                ml.name as motivational_level,
+                st.name as study_time,
+                pa.join_date as premium_join_date,
+                pa.end_date as premium_end_date,
+                pa.raz_reading_level,
+                u.study_buddy_bio,
+                sbt.name as study_buddy_type,
+                l.name as native_language,
+                l2.name as learning_language,
+                ll.name as language_level,
+                tz.name as time_zone,
+                a.name as age_range,
+                u.study_buddy_active
+            FROM users u
+            LEFT JOIN countries c on c.id=u.country_id
+            LEFT JOIN cities on cities.id=u.city_id
+            LEFT JOIN states on states.id=u.state_id
+            LEFT JOIN genders on genders.id=u.gender_id
+            LEFT JOIN study_buddy_types sbt on sbt.id=u.study_buddy_type_id
+            LEFT JOIN languages l3 on l3.id=u.language_preference
+            LEFT JOIN languages l on l.id=u.study_buddy_native_language_id
+            LEFT JOIN languages l2 on l2.id=u.study_buddy_learning_language_id
+            LEFT JOIN language_levels ll on ll.id=u.study_buddy_language_level_id
+            LEFT JOIN timezones tz on tz.id=u.study_buddy_timezone_id
+            LEFT JOIN age_ranges a on a.id=u.study_buddy_age_range_id
+            LEFT JOIN premium_accts pa on pa.id=u.premium_acct_id
+            LEFT JOIN motivation_levels ml on ml.id=u.myway_motivation_level_id
+            LEFT JOIN study_time st on st.id=u.myway_study_time_id
+            WHERE u.username = $1`,
             [username],
         );
 
         const user = userRes.rows[0];
-        console.log('in private, user is', user)
-        if (!user) throw new NotFoundError(`No user: ${username}`);
+
+        if (!user) throw new NotFoundError('NOT_FOUND');
 
         // const userApplicationsRes = await db.query(
         //     `SELECT a.job_id
@@ -159,9 +262,12 @@ class User {
             `SELECT u.username,
                   u.first_name,
                   u.last_name,
-                  c.name as country,
-                  cities.name as city,
-                  states.name as state,
+                  c.name_en as country_en,
+                c.name_ja as country_ja,
+                cities.name_en as city_en,
+                cities.name_ja as city_ja,
+                states.name_en as state_en,
+                states.name_ja as state_ja,
                   genders.name as gender,
                   u.about,
                   u.study_buddy_bio,
@@ -189,7 +295,7 @@ class User {
 
         const user = userRes.rows[0];
 
-        if (!user) throw new NotFoundError(`No user: ${username}`);
+        if (!user) throw new NotFoundError(`NOT_FOUND`);
 
         // const userApplicationsRes = await db.query(
         //     `SELECT a.job_id
@@ -198,6 +304,23 @@ class User {
 
         // user.applications = userApplicationsRes.rows.map(a => a.job_id);
         return user;
+    }
+
+    static async setPassword(username = null, email = null, password) {
+        const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
+        // try to find the user
+        const query = username ? 'username' : 'email'
+        const queryData = username ? username : email
+        const result = await db.query(
+            `UPDATE users SET password =${hashedPassword}
+            WHERE ${query} = $1
+            RETURNING id, username,role`,
+            [queryData],
+        );
+        console.log('got result of password change', result.rows)
+        const user = result.rows[0];
+        return user;
+
     }
     // /** Update user data with `data`.
     //  *

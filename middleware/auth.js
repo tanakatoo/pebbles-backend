@@ -19,7 +19,7 @@ const { UnauthorizedError } = require("../error");
 function authenticateJWT(req, res, next) {
     try {
         const authHeader = req.headers && req.headers.authorization;
-
+        console.log('got header!', authHeader)
         if (authHeader) {
             const token = authHeader.replace(/^[Bb]earer /, "").trim();
             res.locals.user = jwt.verify(token, SECRET_KEY);
@@ -50,7 +50,7 @@ function isLoggedIn(req, res, next) {
 }
 
 
-/** Middleware to use when they be logged in as an admin user.
+/** Middleware to use when they are logged in as an admin user.
  *
  *  If not, raises Unauthorized.
  */
@@ -58,7 +58,7 @@ function isLoggedIn(req, res, next) {
 function ensureAdmin(req, res, next) {
     try {
         if (!res.locals.user || !res.locals.user.isAdmin) {
-            throw new UnauthorizedError();
+            throw new UnauthorizedError("UNAUTHORIZED");
         }
         return next();
     } catch (err) {
@@ -75,7 +75,7 @@ function ensureAdmin(req, res, next) {
 function isCorrectUserOrAdmin(req, res, next) {
     try {
         const user = res.locals.user;
-        console.log(user)
+        console.log('in correctuseror admin', user)
         if (!(user && (user.role === "admin" || user.username === req.params.username))) {
             // throw new UnauthorizedError();
             req.correctUser = false
