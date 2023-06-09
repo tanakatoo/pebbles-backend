@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use('/users', userRoutes)
 app.use('/auth', authRoutes)
 app.use('/external/api', locationRoutes)
+app.use('/messages', locationRoutes)
 
 // sendEmail()
 

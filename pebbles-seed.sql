@@ -42,4 +42,5 @@ INSERT INTO language_levels(name)
 VALUES ('Beginner'),('Intermediate'),('Advanced');
 
 INSERT INTO users(username, password,email,role,sign_up_date,last_login_date,language_preference, gender_id) /*password is asdfasdf*/
-VALUES ('ktoo','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanaka@gmail.com','admin','2023-05-01','2023-05-01',1,1);
+VALUES ('ktoo','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanaka@gmail.com','admin','2023-05-01','2023-05-01',1,1),
+ ('hello','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaa@gmail.com','admin','2023-05-01','2023-05-01',1,1);

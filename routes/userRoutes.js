@@ -30,6 +30,10 @@ router.get('/:username', authenticateJWT, isLoggedIn, isCorrectUserOrAdmin, asyn
     }
 })
 
+/**
+ * Return all study buddies
+ */
+
 // router.get('/:username',)
 
 

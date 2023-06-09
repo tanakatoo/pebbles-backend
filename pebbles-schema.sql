@@ -120,3 +120,23 @@ CREATE TABLE sub_accts(
   last_name VARCHAR(100),
   age_range_id INTEGER REFERENCES age_ranges(id) ON DELETE SET NULL
 );
+
+CREATE TABLE messages(
+    id SERIAL PRIMARY  KEY,
+    send_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    to_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    message TEXT NOT NULL,
+    sent_timestamp TIMESTAMPTZ NOT NULL
+);
+
+CREATE TABLE blocked_users(
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    blocked_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    PRIMARY KEY (blocked_user_id, user_id)
+);
+
+CREATE TABLE saved_users(
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    saved_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, saved_id)
+);

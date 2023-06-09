@@ -19,7 +19,11 @@ router.get('/location', async (req, res, next) => {
 
         const result = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&language=${lang}&types=geocode&key=${process.env.GOOGLE_API_KEY}`)
         let resultToReturn = []
-        result.data.predictions.map(d => resultToReturn.push({ description: d.description, place_id: d.place_id }))
+        console.log(result.data.predictions.map(p => console.log(p.types)))
+        result.data.predictions.map(d => {
+            if (d.types.find(ele => ele == 'locality' || ele == 'country' || ele == 'administrative_area_level_1'))
+                resultToReturn.push({ description: d.description, place_id: d.place_id })
+        })
 
         return res.status(201).json(resultToReturn)
     } catch (e) {
@@ -41,7 +45,7 @@ router.get('/select-location', async (req, res, next) => {
         const resultJA = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&fields=address_component&language=JA&key=${process.env.GOOGLE_API_KEY}`)
 
         //parse and return full names of location in both languages
-        console.log(resultEN.data.result.address_components, resultJA.data.result.address_components)
+        console.log(resultEN.data.result, resultJA.data.result)
         let city
         let state
         let country
