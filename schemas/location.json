@@ -10,12 +10,18 @@
         "type": "string",
         "minLength": 2,
         "maxLength": 2
+      },
+      "sessionToken": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
       }
     },
     "additionalProperties": false,
     "required": [
       "q",
-      "lang"
+      "lang",
+      "sessionToken"
     ]
   }
   

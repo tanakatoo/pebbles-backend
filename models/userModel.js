@@ -4,18 +4,33 @@
 
 const db = require("../db");
 const bcrypt = require("bcrypt");
-// const userErrors = require('../json/userErrors.json')
 const { BCRYPT_WORK_FACTOR } = require('../config')
-// const { sqlForPartialUpdate } = require("../helpers/sql");
 const {
     NotFoundError,
     BadRequestError,
     UnauthorizedError,
 } = require("../error");
-const { use } = require("passport");
 
 
 class User {
+
+    /**
+     * Get user role every time we need to authorize them in case their role is changed in the backend
+     * return user id, role
+     */
+    static async getRole(id) {
+        const result = await db.query(
+            `SELECT role
+            FROM users
+            WHERE id=$1`, [id]
+        )
+        console.log('in getting role, role is', result.rows[0])
+        if (!result.rows[0]) {
+            throw new NotFoundError
+        }
+        return result.rows[0]
+    }
+
 
     /** Register user with username, email, password
      *
@@ -147,6 +162,11 @@ class User {
         throw new UnauthorizedError('INVALID_CREDENTIALS');
     }
 
+    /**
+     * See if a username or email exists for changing password
+     * @returns user
+     */
+
     static async findUser(username = null, email = null) {
         // try to find the user
         const query = username ? 'username' : 'email'
@@ -157,29 +177,11 @@ class User {
                WHERE ${query} = $1`,
             [queryData],
         );
-        console.log('got result', result.rows)
+
         const user = result.rows[0];
         return user;
 
     }
-    // /** Find all users.
-    //  *
-    //  * Returns [{ username, first_name, last_name, email, is_admin }, ...]
-    //  **/
-
-    // static async findAll() {
-    //     const result = await db.query(
-    //         `SELECT username,
-    //               first_name AS "firstName",
-    //               last_name AS "lastName",
-    //               email,
-    //               is_admin AS "isAdmin"
-    //        FROM users
-    //        ORDER BY username`,
-    //     );
-
-    //     return result.rows;
-    // }
 
     /** Given a username, return data about user.
      *
@@ -243,16 +245,9 @@ class User {
         );
 
         const user = userRes.rows[0];
-
         if (!user) throw new NotFoundError('NOT_FOUND');
-
-        // const userApplicationsRes = await db.query(
-        //     `SELECT a.job_id
-        //    FROM applications AS a
-        //    WHERE a.username = $1`, [username]);
-
-        // user.applications = userApplicationsRes.rows.map(a => a.job_id);
         delete user.password
+
         return user;
     }
 
@@ -294,17 +289,16 @@ class User {
         );
 
         const user = userRes.rows[0];
-
         if (!user) throw new NotFoundError(`NOT_FOUND`);
 
-        // const userApplicationsRes = await db.query(
-        //     `SELECT a.job_id
-        //    FROM applications AS a
-        //    WHERE a.username = $1`, [username]);
-
-        // user.applications = userApplicationsRes.rows.map(a => a.job_id);
         return user;
     }
+
+    /**
+     * Accepts username or email and password and updates the user record with the  password
+     * 
+     * @returns id, username and role
+     */
 
     static async setPassword(username = null, email = null, password) {
         const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
@@ -317,11 +311,51 @@ class User {
             RETURNING id, username,role`,
             [queryData],
         );
-        console.log('got result of password change', result.rows)
+
         const user = result.rows[0];
         return user;
 
     }
+
+
+    /** Get all users that the logged in user blocked
+         *
+         * Returns [id] on success
+         *
+         **/
+
+    static async getBlockedUsers(id) {
+
+        //get a list of users that the logged in user has blocked
+        //this is so users can unblock users
+        const listOfBlockedUsers = await db.query(
+            `SELECT blocked_user_id FROM blocked_users WHERE user_id = $1`, [id]
+        )
+
+        console.log(listOfBlockedUsers.rows)
+        return listOfBlockedUsers.rows;
+    }
+
+    /** Unblock a user
+         *
+         * Returns [id] on success
+         *
+         **/
+
+    static async unblockUser(id, unblock_id) {
+
+        //get a list of users that the logged in user has blocked
+        //this is so users can unblock users
+        const unblockUser = await db.query(
+            `DELETE FROM blocked_users WHERE user_id=$1 and blocked_user_id=$2`, [id, unblock_id]
+        )
+
+        console.log(unblockUser)
+        return unblockUser;
+    }
+
+
+
     // /** Update user data with `data`.
     //  *
     //  * This is a "partial update" --- it's fine if data doesn't contain

@@ -3,8 +3,13 @@ const jsonschema = require('jsonschema')
 const router = express.Router();
 const locationSchema = require("../schemas/location.json")
 const saveLocationSchema = require("../schemas/saveLocation.json")
-const { BadRequestError } = require("../error")
+const { BadRequestError, UnauthorizedError } = require("../error")
 const axios = require('axios')
+const { Client } = require('@googlemaps/google-maps-services-js');
+
+
+const client = new Client({ apiKey: process.env.GOOGLE_API_KEY });
+
 
 router.get('/location', async (req, res, next) => {
 
@@ -15,13 +20,24 @@ router.get('/location', async (req, res, next) => {
             const errs = validator.errors.map(e => e.stack)
             throw new BadRequestError(errs)
         }
-        const { q, lang } = req.query
 
-        const result = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&language=${lang}&types=geocode&key=${process.env.GOOGLE_API_KEY}`)
+        const { q, lang, sessionToken } = req.query
+        console.log('sessiontoken for locaton query', sessionToken)
+        const result = await client.placeAutocomplete({
+            params: {
+                input: q,
+                language: lang,
+                types: '(regions)',
+                key: process.env.GOOGLE_API_KEY,
+                sessiontoken: sessionToken
+            },
+            timeout: 1000 // Optional timeout value in milliseconds
+        });
         let resultToReturn = []
-        console.log(result.data.predictions.map(p => console.log(p.types)))
+
+        //some locations do not have types, so we have to check if there are "types" associated with the location
         result.data.predictions.map(d => {
-            if (d.types.find(ele => ele == 'locality' || ele == 'country' || ele == 'administrative_area_level_1'))
+            if (d.types && (d.types.find(ele => ele == 'locality' || ele == 'country' || ele == 'administrative_area_level_1')))
                 resultToReturn.push({ description: d.description, place_id: d.place_id })
         })
 
@@ -33,17 +49,35 @@ router.get('/location', async (req, res, next) => {
 
 router.get('/select-location', async (req, res, next) => {
     try {
-        const validator = jsonschema.validate(req.body, saveLocationSchema)
+        const validator = jsonschema.validate(req.query, saveLocationSchema)
         if (!validator.valid) {
 
             const errs = validator.errors.map(e => e.stack)
             throw new BadRequestError(errs)
         }
-        const { id, userId } = req.body
-
-        const resultEN = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&fields=address_component&language=EN&key=${process.env.GOOGLE_API_KEY}`)
-        const resultJA = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&fields=address_component&language=JA&key=${process.env.GOOGLE_API_KEY}`)
-
+        const { id, sessionToken } = req.query
+        console.log('session token for the first query', sessionToken)
+        // const resultEN = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&fields=address_component&language=EN&key=${process.env.GOOGLE_API_KEY}`)
+        // const resultJA = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&fields=address_component&language=JA&key=${process.env.GOOGLE_API_KEY}`)
+        const resultEN = await client.placeDetails({
+            params: {
+                place_id: id,
+                fields: 'address_component',
+                language: 'en',
+                sessiontoken: sessionToken,
+                key: process.env.GOOGLE_API_KEY
+            },
+            timeout: 1000 // Optional timeout value in milliseconds
+        });
+        const resultJA = await client.placeDetails({
+            params: {
+                place_id: id,
+                fields: 'address_component',
+                language: 'ja',
+                key: process.env.GOOGLE_API_KEY
+            },
+            timeout: 1000 // Optional timeout value in milliseconds
+        });
         //parse and return full names of location in both languages
         console.log(resultEN.data.result, resultJA.data.result)
         let city
@@ -85,7 +119,7 @@ router.get('/select-location', async (req, res, next) => {
                 state: state,
                 country: country
             },
-            JP: {
+            JA: {
                 city: city_ja,
                 state: state_ja,
                 country: country_ja

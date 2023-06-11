@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.3.31",
     "@mailchimp/mailchimp_transactional": "^1.0.50",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",

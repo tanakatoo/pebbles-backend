@@ -6,16 +6,16 @@
         "minLength": 1,
         "maxLength": 200
       },
-      "userId": {
+      "sessionToken": {
         "type": "string",
-        "minLength": 1,
+        "minLength": 0,
         "maxLength": 200
       }
     },
     "additionalProperties": false,
     "required": [
       "id",
-      "userId"
+      "sessionToken"
     ]
   }
   

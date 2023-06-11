@@ -11,58 +11,35 @@ const {
 
 class Message {
 
-    /** Get all users that the logged in user has messaged
+    /** Get all users that the logged in user has messaged without the blocked users
      *
-     * Returns [id, username] on success and BadRequestError on duplicates
+     * Returns [id] on success
      *
      **/
 
-    static async getUsersList(
-        { id }) {
+    static async getUsersList(id) {
 
-        //check if email is already used
-        const checkDuplicateEmail = await db.query(
-            `SELECT email
-           FROM users
-           WHERE email = $1`,
-            [email],
-        );
-        if (checkDuplicateEmail.rows[0]) {
+        //get a list of users that the logged in user has messages for and filter out those that the user has blocked
+        //this is so users can block more users
+        const listOfUsers = await db.query(
+            `SELECT DISTINCT m.from_user_id FROM messages m 
+            WHERE to_user_id NOT IN 
+            (SELECT blocked_user_id FROM blocked_users WHERE user_id = 2)
+            AND from_user_id NOT IN
+            (SELECT blocked_user_id FROM blocked_users WHERE user_id = 2)`, [id]
+        )
 
-            throw new BadRequestError("DUPLICATE_EMAIL");
-        }
-        //check if username is already used
-        const checkDuplicateUsername = await db.query(
-            `SELECT username
-            FROM users
-            WHERE username = $1`,
-            [username],
-        );
-        if (checkDuplicateUsername.rows[0]) {
-
-            throw new BadRequestError("USERNAME_TAKEN");
-        }
-
-        const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
-
-        const result = await db.query(
-            `INSERT INTO users
-           (username,
-            password,
-            email)
-           VALUES ($1, $2, $3)
-           RETURNING id, username,role`,
-            [
-                username,
-                hashedPassword,
-                email
-            ],
-        );
-
-        const user = result.rows[0];
-
-        return user;
+        console.log(listOfUsers.rows)
+        return listOfUsers.rows;
     }
+
+
+
+
+
+
+
+
 
     /** login user with username or email, password.
      *

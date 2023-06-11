@@ -123,11 +123,14 @@ CREATE TABLE sub_accts(
 
 CREATE TABLE messages(
     id SERIAL PRIMARY  KEY,
-    send_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    from_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     to_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    message TEXT NOT NULL,
-    sent_timestamp TIMESTAMPTZ NOT NULL
+    msg TEXT NOT NULL,
+    read BOOLEAN NOT NULL DEFAULT false,
+    sent_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX idx_date ON messages (sent_at DESC);
 
 CREATE TABLE blocked_users(
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,

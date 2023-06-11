@@ -3,6 +3,7 @@ const cors = require("cors");
 const ExpressError = require('./error')
 const userRoutes = require('./routes/userRoutes')
 const authRoutes = require('./routes/authRoutes');
+const messageRoutes = require('./routes/messageRoutes')
 const locationRoutes = require("./routes/externalApiRoutes")
 // const mailchimpTx = require("@mailchimp/mailchimp_transactional")(process.env.MAILCHIMP_API_KEY)
 const app = express();
@@ -14,7 +15,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use('/users', userRoutes)
 app.use('/auth', authRoutes)
 app.use('/external/api', locationRoutes)
-app.use('/messages', locationRoutes)
+app.use('/messages', messageRoutes)
 
 // sendEmail()
 

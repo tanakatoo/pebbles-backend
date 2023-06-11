@@ -43,4 +43,46 @@ VALUES ('Beginner'),('Intermediate'),('Advanced');
 
 INSERT INTO users(username, password,email,role,sign_up_date,last_login_date,language_preference, gender_id) /*password is asdfasdf*/
 VALUES ('ktoo','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanaka@gmail.com','admin','2023-05-01','2023-05-01',1,1),
- ('hello','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaa@gmail.com','admin','2023-05-01','2023-05-01',1,1);
+ ('hello','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaa@gmail.com','admin','2023-05-01','2023-05-01',1,1),
+ ('blockMe','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaaa@gmail.com','admin','2023-05-01','2023-05-01',1,1);
+
+INSERT INTO messages (from_user_id,to_user_id,msg, sent_at, read) 
+VALUES (1,2,'first message', '2023-06-07 15:30:00+00:00', true), 
+(2,1,'2nd most recent one reply', '2023-06-08 15:30:00+00:00', false),
+(1,2,'the most recent one reply to second one', '2023-06-09 15:30:00+00:00', false),
+(2,3,'from 2 to 3 first msg','2023-06-04 15:30:00+00:00', true),
+(3,2, 'from 3-2 latest message','2023-06-08 15:30:00+00:00', true);
+
+INSERT INTO blocked_users (user_id,blocked_user_id)
+VALUES (1,3), (2,3);
+
+INSERT INTO saved_users (user_id,saved_id)
+VALUES (1,2);
+
+-- subquery to get all messages from users that are not blocked
+select * from messages where to_user_id != (select blocked_user_id from blocked_users where user_id = 2) and 
+from_user_id != (select blocked_user_id from blocked_users where user_id = 2);
+
+--query to get the most recent message from users that are not blocked for the logged in user 
+SELECT from_user_id, to_user_id,msg, sent_at, read
+FROM (
+  SELECT 
+    from_user_id, to_user_id,msg, sent_at, read,
+    ROW_NUMBER() OVER (PARTITION BY 
+      CASE WHEN from_user_id = 2 THEN to_user_id
+           ELSE from_user_id
+      END
+      ORDER BY sent_at DESC) AS rn
+  FROM (SELECT * FROM messages 
+    WHERE 
+    to_user_id not in (SELECT blocked_user_id 
+                        FROM blocked_users 
+                        WHERE user_id = 2) AND 
+    from_user_id not in (SELECT blocked_user_id 
+                    FROM blocked_users 
+                    WHERE user_id = 2)) as subsubquery
+  WHERE 2 IN (from_user_id, to_user_id)
+) AS subquery
+WHERE rn = 1 ORDER BY read ASC;
+
+--query to get the unread messages
