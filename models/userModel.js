@@ -1,7 +1,5 @@
 "use strict";
 
-//selects from the backend to get data
-
 const db = require("../db");
 const bcrypt = require("bcrypt");
 const { BCRYPT_WORK_FACTOR } = require('../config')
@@ -10,11 +8,42 @@ const {
     BadRequestError,
     UnauthorizedError,
 } = require("../error");
-
-
+const { getUserID } = require('../helpers/getUserID')
+const { baseQuery, privateBaseQuery } = require('../helpers/variables')
+const { generateUpdateQuery,
+    addTextValuesToQuery,
+    updateManyToMany,
+    insertCountryStateCity } = require('../helpers/generateUpdateQuery')
+const { getManyToManyData } = require('../helpers/getManyToManyData')
 class User {
 
-    /**
+
+    /** WORKS 
+     * Get all users that the logged in user has messaged without the blocked users
+     * (used for blocking additional users)
+     * Returns [id] on success
+     *
+     **/
+
+    static async getUsersList(id) {
+
+        //get a list of users that the logged in user has messages for and filter out those that the user has blocked
+        //this is so users can block more users
+        const listOfUsers = await db.query(
+            `SELECT DISTINCT 
+                CASE
+                    WHEN from_user_id = $1 THEN to_user_id
+                    WHEN to_user_id = $1 THEN from_user_id
+                END AS user_id
+            FROM messages
+            WHERE from_user_id = $1 OR to_user_id = $1`, [id]
+        )
+
+        console.log(listOfUsers.rows)
+        return listOfUsers.rows;
+    }
+
+    /**WORKS 
      * Get user role every time we need to authorize them in case their role is changed in the backend
      * return user id, role
      */
@@ -26,11 +55,71 @@ class User {
         )
         console.log('in getting role, role is', result.rows[0])
         if (!result.rows[0]) {
+            console.log('not found?')
             throw new NotFoundError
         }
         return result.rows[0]
     }
 
+    /**WORKS  
+     * Get all users that the user has blocked
+     *
+     * Returns [id] on success
+     *
+     **/
+
+    static async getBlockedUsers(id) {
+
+        //get a list of users that the logged in user has messages for and filter out those that the user has blocked
+        //this is so users scan block more users
+        const listOfBlockedUsers = await db.query(
+            `SELECT blocked_user_id FROM blocked_users 
+            WHERE user_id = $1`, [id])
+
+        console.log(listOfBlockedUsers.rows)
+        return listOfBlockedUsers.rows;
+    }
+
+
+    /**WORKS  
+     * Block a user
+     *
+     * Returns id, username of blocked user on success
+     *
+     **/
+
+    static async blockUser(username, id) {
+
+        //get user id of the user to block
+        const user_id = await getUserID(username)
+
+        const result = await db.query(
+            `INSERT INTO blocked_users (user_id,blocked_user_id) values($1,$2)`, [id, user_id])
+
+        console.log(result.rows)
+        return result.rows[0];
+    }
+
+    /**WORKS  
+     * Unblock a user
+         *
+         * Returns [id] on success
+         *
+         **/
+
+    static async unblockUser(id, username) {
+        //get user id of the user to block
+        const user_id = await getUserID(username)
+
+        //get a list of users that the logged in user has blocked
+        //this is so users can unblock users
+        const unblockUser = await db.query(
+            `DELETE FROM blocked_users WHERE user_id=$1 and blocked_user_id=$2`, [id, user_id]
+        )
+
+        console.log(unblockUser)
+        return unblockUser;
+    }
 
     /** Register user with username, email, password
      *
@@ -97,53 +186,7 @@ class User {
         const query = username ? 'username' : 'email'
         const queryData = username ? username : email
         const result = await db.query(
-            `SELECT u.id,
-            u.username,
-            u.password,
-            u.first_name,
-            u.last_name,
-            u.email,
-            u.role,
-            u.sign_up_date,
-            u.last_login_date,
-            l3.name as language_preference,
-            c.name_en as country_en,
-            c.name_ja as country_ja,
-            cities.name_en as city_en,
-            cities.name_ja as city_ja,
-            states.name_en as state_en,
-            states.name_ja as state_ja,
-            genders.name as gender,
-            u.about,
-            u.myway_habits,
-            ml.name as motivational_level,
-            st.name as study_time,
-            pa.join_date as premium_join_date,
-            pa.end_date as premium_end_date,
-            pa.raz_reading_level,
-            u.study_buddy_bio,
-            sbt.name as study_buddy_type,
-            l.name as native_language,
-            l2.name as learning_language,
-            ll.name as language_level,
-            tz.name as time_zone,
-            a.name as age_range,
-            u.study_buddy_active
-            FROM users u
-            LEFT JOIN countries c on c.id=u.country_id
-            LEFT JOIN cities on cities.id=u.city_id
-            LEFT JOIN states on states.id=u.state_id
-            LEFT JOIN genders on genders.id=u.gender_id
-            LEFT JOIN study_buddy_types sbt on sbt.id=u.study_buddy_type_id
-            LEFT JOIN languages l3 on l3.id=u.language_preference
-            LEFT JOIN languages l on l.id=u.study_buddy_native_language_id
-            LEFT JOIN languages l2 on l2.id=u.study_buddy_learning_language_id
-            LEFT JOIN language_levels ll on ll.id=u.study_buddy_language_level_id
-            LEFT JOIN timezones tz on tz.id=u.study_buddy_timezone_id
-            LEFT JOIN age_ranges a on a.id=u.study_buddy_age_range_id
-            LEFT JOIN premium_accts pa on pa.id=u.premium_acct_id
-            LEFT JOIN motivation_levels ml on ml.id=u.myway_motivation_level_id
-            LEFT JOIN study_time st on st.id=u.myway_study_time_id
+            `${privateBaseQuery}
                WHERE ${query} = $1`,
             [queryData],
         );
@@ -183,6 +226,150 @@ class User {
 
     }
 
+
+    /**
+     * To favourite a user
+     * @returns 201
+     */
+    static async saveUser(user_id, save_id) {
+        const result = await db.query(
+            `INSERT INTO saved_users (user_id,saved_id)
+            VALUES ($1,$2)
+            `, [user_id, save_id]
+        )
+
+        console.log(result)
+        return "success";
+    }
+
+
+    /**
+         * To unfavourite a user
+         * @returns 204
+         */
+    static async unsaveUser(user_id, save_id) {
+        const result = await db.query(
+            `DELETE FROM saved_users
+            WHERE user_id=$1 AND saved_id=$2
+        `, [user_id, save_id]
+        )
+
+        //even if record doesn't exist, it is not an error
+        return "success";
+    }
+
+    /**
+        * Returns list of saved usernames for the logged in user
+        * @returns 201
+        */
+    static async saved(id) {
+        const result = await db.query(
+            ` SELECT u.username
+            FROM users u
+            INNER JOIN saved_users su
+            ON su.saved_id=u.id
+            WHERE su.user_id==$1
+        `, [id]
+        )
+
+
+        return result.rows;
+    }
+
+    /**works
+        * updates data for the logged in user
+        * @returns 201
+        */
+    static async update(id, data) {
+
+        //we have to get the ids of the data we are saving to save to the user table
+        //the data passed me must already be the "english" version of the data stored in the db for us to find the id
+        //data can be an array
+        //use Object.keys(object).find(key => object[key] === value); in the frontend
+        //so we replace the info in the incoming data to IDs to be saved and then create a query from that
+        let index = 2;
+        let query = '';
+        let values = [id];
+        [query, values, index] = await generateUpdateQuery(data.gender, 'genders', 'gender_id', query, values, index);
+        [query, values, index] = await generateUpdateQuery(data.timezone, 'timezones', 'study_buddy_timezone_id', query, values, index);
+        [query, values, index] = await generateUpdateQuery(data.age, 'age_ranges', 'study_buddy_age_range_id', query, values, index);
+        [query, values, index] = await generateUpdateQuery(data.motivation_level, 'motivation_levels', 'myway_motivation_level_id', query, values, index);
+        [query, values, index] = await generateUpdateQuery(data.language_level, 'language_levels', 'study_buddy_language_level_id', query, values, index);
+        [query, values, index] = await generateUpdateQuery(data.study_time, 'study_times', 'myway_study_time_id', query, values, index);
+        [query, values, index] = await generateUpdateQuery(data.native_language, 'languages', 'study_buddy_native_language_id', query, values, index);
+        [query, values, index] = await generateUpdateQuery(data.learning_language, 'languages', 'study_buddy_learning_language_id', query, values, index);
+
+        //add other text into query
+        [query, values, index] = addTextValuesToQuery(data.first_name, 'first_name', query, values, index);
+        [query, values, index] = addTextValuesToQuery(data.last_name, 'last_name', query, values, index);
+        [query, values, index] = addTextValuesToQuery(data.about, 'about', query, values, index);
+        [query, values, index] = addTextValuesToQuery(data.myway_habits, 'myway_habits', query, values, index);
+        [query, values, index] = addTextValuesToQuery(data.study_buddy_bio, 'study_buddy_bio', query, values, index);
+        [query, values, index] = addTextValuesToQuery(data.study_buddy_active, 'study_buddy_active', query, values, index);
+
+        if (data.study_buddy_active && data.study_buddy_active === true) {
+            //also add activate date
+            let date = new Date(Date.now());
+            date = `${date.getUTCFullYear()}/${date.getUTCMonth() + 1}/${date.getUTCDate()}`;
+            [query, values, index] = addTextValuesToQuery(date, 'study_buddy_activate_date', query, values, index);
+        };
+
+
+        //if city,country,state are in the data, we have to save that first
+        //insert country, state city in that order, return the id to insert into next table
+        //insert only if it doesn't exist
+        //if we have an english version, we will have a japanese version
+
+        //if no country specified, then set column to null
+        let country_id = 0
+        let state_id = 0
+        let city_id = 0
+        if (data.country_en && data.country_ja) {
+            [query, values, index, country_id] = await insertCountryStateCity(data.country_en, data.country_ja, 'countries', 'country_id', null, null, query, values, index);
+            if (data.state_en && data.state_ja) {
+                [query, values, index, state_id] = await insertCountryStateCity(data.state_en, data.state_ja, 'states', 'state_id', country_id, 'country_id', query, values, index)
+                if (data.city_en && data.city_ja) {
+                    [query, values, index, city_id] = await insertCountryStateCity(data.city_en, data.city_ja, 'cities', 'city_id', state_id, 'state_id', query, values, index);
+                } else {
+                    query += `, city_id=$${index}`;
+                    values.push(null)
+                }
+            }
+            else {
+                query += `, state_id=$${index}, city_id=$${index + 1}`;
+                values.push(null)
+                values.push(null)
+            }
+        } else {
+            query += `, country_id= $${index}, state_id=$${index + 1}, city_id=$${index + 2}`;
+            values.push(null)
+            values.push(null)
+            values.push(null)
+        }
+
+        console.log('query end', query)
+        console.log('values end', values)
+
+        /** test query
+         * {"gender":"other","timezone":"HongKong", "age":"26-35","motivation_level":"Very", "study_time":"everyday","native_language":"English","learning_language":"Japanese","study_buddy_types":["StudyBuddy","LanguageExchange"],"language_level":"Intermediate","first_name":"OMG", "last_name":"oommgg","study_buddy_active":true,"about":"testing about","myway_habits":"my habits","study_buddy_bio":"the bio","goals":["Pronunciation"], "country_en":"new country","country_ja":"jap new c","state_en":"new state","state_ja":"jap new state", "city_en":"new city","city_ja":"jap new city"}
+         */
+
+        //update users table this works
+
+        const resultsUsers = db.query(
+            `UPDATE users 
+            SET ${query} 
+            WHERE id = $1`, values
+        );
+
+        await updateManyToMany(data.goals, id, 'goals', 'goals_users', 'user_id', 'goal_id')
+        await updateManyToMany(data.study_buddy_types, id, 'study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id')
+
+
+        return 'done'
+    }
+
+
     /** Given a username, return data about user.
      *
      * Returns { username, first_name, last_name, is_admin, jobs }
@@ -191,62 +378,23 @@ class User {
      * Throws NotFoundError if user not found.
      **/
 
-    static async getPrivate(username) {
+    static async getPrivate(id) {
 
         const userRes = await db.query(
-            `SELECT u.id,
-                u.username,
-                u.first_name,
-                u.last_name,
-                u.email,
-                u.role,
-                u.sign_up_date,
-                u.last_login_date,
-                l3.name as language_preference,
-                c.name_en as country_en,
-                c.name_ja as country_ja,
-                cities.name_en as city_en,
-                cities.name_ja as city_ja,
-                states.name_en as state_en,
-                states.name_ja as state_ja,
-                genders.name as gender,
-                u.about,
-                u.myway_habits,
-                ml.name as motivational_level,
-                st.name as study_time,
-                pa.join_date as premium_join_date,
-                pa.end_date as premium_end_date,
-                pa.raz_reading_level,
-                u.study_buddy_bio,
-                sbt.name as study_buddy_type,
-                l.name as native_language,
-                l2.name as learning_language,
-                ll.name as language_level,
-                tz.name as time_zone,
-                a.name as age_range,
-                u.study_buddy_active
-            FROM users u
-            LEFT JOIN countries c on c.id=u.country_id
-            LEFT JOIN cities on cities.id=u.city_id
-            LEFT JOIN states on states.id=u.state_id
-            LEFT JOIN genders on genders.id=u.gender_id
-            LEFT JOIN study_buddy_types sbt on sbt.id=u.study_buddy_type_id
-            LEFT JOIN languages l3 on l3.id=u.language_preference
-            LEFT JOIN languages l on l.id=u.study_buddy_native_language_id
-            LEFT JOIN languages l2 on l2.id=u.study_buddy_learning_language_id
-            LEFT JOIN language_levels ll on ll.id=u.study_buddy_language_level_id
-            LEFT JOIN timezones tz on tz.id=u.study_buddy_timezone_id
-            LEFT JOIN age_ranges a on a.id=u.study_buddy_age_range_id
-            LEFT JOIN premium_accts pa on pa.id=u.premium_acct_id
-            LEFT JOIN motivation_levels ml on ml.id=u.myway_motivation_level_id
-            LEFT JOIN study_time st on st.id=u.myway_study_time_id
-            WHERE u.username = $1`,
-            [username],
+            `${privateBaseQuery}
+            WHERE u.id = $1`,
+            [id],
         );
 
         const user = userRes.rows[0];
+
         if (!user) throw new NotFoundError('NOT_FOUND');
         delete user.password
+
+        const studyBuddies = await getManyToManyData('study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id', id)
+        user.study_buddy_types = studyBuddies.map(a => a.name)
+        const goals = await getManyToManyData('goals', 'goals_users', 'user_id', 'goal_id', id)
+        user.goals = goals.map(a => a.name)
 
         return user;
     }
@@ -254,43 +402,16 @@ class User {
 
     static async getPublic(username) {
         const userRes = await db.query(
-            `SELECT u.username,
-                  u.first_name,
-                  u.last_name,
-                  c.name_en as country_en,
-                c.name_ja as country_ja,
-                cities.name_en as city_en,
-                cities.name_ja as city_ja,
-                states.name_en as state_en,
-                states.name_ja as state_ja,
-                  genders.name as gender,
-                  u.about,
-                  u.study_buddy_bio,
-                  sbt.name as study_buddy_type,
-                  l.name as native_language,
-                  l2.name as learning_language,
-                  ll.name as language_level,
-                  tz.name as time_zone,
-                  a.name as age_range,
-                  u.study_buddy_active
-           FROM users u
-            LEFT JOIN countries c on c.id=u.country_id
-            LEFT JOIN cities on cities.id=u.city_id
-            LEFT JOIN states on states.id=u.state_id
-            LEFT JOIN genders on genders.id=u.gender_id
-            LEFT JOIN study_buddy_types sbt on sbt.id=u.study_buddy_type_id
-            LEFT JOIN languages l on l.id=u.study_buddy_native_language_id
-            LEFT JOIN languages l2 on l2.id=u.study_buddy_learning_language_id
-            LEFT JOIN language_levels ll on ll.id=u.study_buddy_language_level_id
-            LEFT JOIN timezones tz on tz.id=u.study_buddy_timezone_id
-            LEFT JOIN age_ranges a on a.id=u.study_buddy_age_range_id
-           WHERE u.username = $1`,
+            `${baseQuery}
+            WHERE u.username = $1`,
             [username],
         );
 
         const user = userRes.rows[0];
         if (!user) throw new NotFoundError(`NOT_FOUND`);
 
+        const studyBuddies = await getManyToManyData('study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id', id)
+        user.study_buddy_types = studyBuddies.map(a => a.name)
         return user;
     }
 
@@ -306,147 +427,16 @@ class User {
         const query = username ? 'username' : 'email'
         const queryData = username ? username : email
         const result = await db.query(
-            `UPDATE users SET password =${hashedPassword}
+            `UPDATE users SET password = ${hashedPassword}
             WHERE ${query} = $1
-            RETURNING id, username,role`,
+            RETURNING id, username, role`,
             [queryData],
         );
 
         const user = result.rows[0];
         return user;
-
     }
 
-
-    /** Get all users that the logged in user blocked
-         *
-         * Returns [id] on success
-         *
-         **/
-
-    static async getBlockedUsers(id) {
-
-        //get a list of users that the logged in user has blocked
-        //this is so users can unblock users
-        const listOfBlockedUsers = await db.query(
-            `SELECT blocked_user_id FROM blocked_users WHERE user_id = $1`, [id]
-        )
-
-        console.log(listOfBlockedUsers.rows)
-        return listOfBlockedUsers.rows;
-    }
-
-    /** Unblock a user
-         *
-         * Returns [id] on success
-         *
-         **/
-
-    static async unblockUser(id, unblock_id) {
-
-        //get a list of users that the logged in user has blocked
-        //this is so users can unblock users
-        const unblockUser = await db.query(
-            `DELETE FROM blocked_users WHERE user_id=$1 and blocked_user_id=$2`, [id, unblock_id]
-        )
-
-        console.log(unblockUser)
-        return unblockUser;
-    }
-
-
-
-    // /** Update user data with `data`.
-    //  *
-    //  * This is a "partial update" --- it's fine if data doesn't contain
-    //  * all the fields; this only changes provided ones.
-    //  *
-    //  * Data can include:
-    //  *   { firstName, lastName, password, email, isAdmin }
-    //  *
-    //  * Returns { username, firstName, lastName, email, isAdmin }
-    //  *
-    //  * Throws NotFoundError if not found.
-    //  *
-    //  * WARNING: this function can set a new password or make a user an admin.
-    //  * Callers of this function must be certain they have validated inputs to this
-    //  * or a serious security risks are opened.
-    //  */
-
-    // static async update(username, data) {
-    //     if (data.password) {
-    //         data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
-    //     }
-
-    //     const { setCols, values } = sqlForPartialUpdate(
-    //         data,
-    //         {
-    //             firstName: "first_name",
-    //             lastName: "last_name",
-    //             isAdmin: "is_admin",
-    //         });
-    //     const usernameVarIdx = "$" + (values.length + 1);
-
-    //     const querySql = `UPDATE users 
-    //                   SET ${setCols} 
-    //                   WHERE username = ${usernameVarIdx} 
-    //                   RETURNING username,
-    //                             first_name AS "firstName",
-    //                             last_name AS "lastName",
-    //                             email,
-    //                             is_admin AS "isAdmin"`;
-    //     const result = await db.query(querySql, [...values, username]);
-    //     const user = result.rows[0];
-
-    //     if (!user) throw new NotFoundError(`No user: ${username}`);
-
-    //     delete user.password;
-    //     return user;
-    // }
-
-    // /** Delete given user from database; returns undefined. */
-
-    // static async remove(username) {
-    //     let result = await db.query(
-    //         `DELETE
-    //        FROM users
-    //        WHERE username = $1
-    //        RETURNING username`,
-    //         [username],
-    //     );
-    //     const user = result.rows[0];
-
-    //     if (!user) throw new NotFoundError(`No user: ${username}`);
-    // }
-
-    // /** Apply for job: update db, returns undefined.
-    //  *
-    //  * - username: username applying for job
-    //  * - jobId: job id
-    //  **/
-
-    // static async applyToJob(username, jobId) {
-    //     const preCheck = await db.query(
-    //         `SELECT id
-    //        FROM jobs
-    //        WHERE id = $1`, [jobId]);
-    //     const job = preCheck.rows[0];
-
-    //     if (!job) throw new NotFoundError(`No job: ${jobId}`);
-
-    //     const preCheck2 = await db.query(
-    //         `SELECT username
-    //        FROM users
-    //        WHERE username = $1`, [username]);
-    //     const user = preCheck2.rows[0];
-
-    //     if (!user) throw new NotFoundError(`No username: ${username}`);
-
-    //     await db.query(
-    //         `INSERT INTO applications (job_id, username)
-    //        VALUES ($1, $2)`,
-    //         [jobId, username]);
-    // }
 }
 
 

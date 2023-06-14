@@ -8,7 +8,7 @@ const axios = require('axios')
 const { Client } = require('@googlemaps/google-maps-services-js');
 
 
-const client = new Client({ apiKey: process.env.GOOGLE_API_KEY });
+const client = new Client();
 
 
 router.get('/location', async (req, res, next) => {

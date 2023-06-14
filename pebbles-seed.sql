@@ -1,16 +1,16 @@
 INSERT INTO timezones(name)
-VALUES ('Los Angeles'),
+VALUES ('LosAngeles'),
 ('Chicago'),
-('New York'),
+('NewYork'),
 ('Toronto'),
-('Sao Paulo'),
+('SaoPaulo'),
 ('London'),
 ('Paris'),
 ('Zurich'),
 ('Cairo'),
 ('Moscow'),
 ('Dubai'),
-('Hong Kong'),
+('HongKong'),
 ('Shanghai'),
 ('Singapore'),
 ('Tokyo'),
@@ -21,7 +21,7 @@ INSERT INTO genders(name)
 VALUES ('male'),('female'),('other');
 
 INSERT INTO age_ranges(name)
-VALUES ('18 - 25'),('26 - 35'),('36 - 45'),('46 - 59'),('60+');
+VALUES ('18-25'),('26-35'),('36-45'),('46-59'),('60+');
 
 INSERT INTO goals(name)
 VALUES ('Vocabulary'),('Pronunciation'),('Listening'),('Writing'),('Speaking');
@@ -29,11 +29,11 @@ VALUES ('Vocabulary'),('Pronunciation'),('Listening'),('Writing'),('Speaking');
 INSERT INTO motivation_levels(name)
 VALUES ('Very'),('Average'),('Low'),('None');
 
-INSERT INTO study_time(name)
+INSERT INTO study_times(name)
 VALUES ('everyday'),('three'),('once'),('notFrequent'),('never');
 
 INSERT INTO study_buddy_types(name)
-VALUES ('Study buddy'),('Language exchange'),('Volunteer');
+VALUES ('StudyBuddy'),('LanguageExchange'),('Volunteer');
 
 INSERT INTO languages(name)
 VALUES ('English'),('Japanese');
@@ -44,7 +44,7 @@ VALUES ('Beginner'),('Intermediate'),('Advanced');
 INSERT INTO users(username, password,email,role,sign_up_date,last_login_date,language_preference, gender_id) /*password is asdfasdf*/
 VALUES ('ktoo','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanaka@gmail.com','admin','2023-05-01','2023-05-01',1,1),
  ('hello','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaa@gmail.com','admin','2023-05-01','2023-05-01',1,1),
- ('blockMe','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaaa@gmail.com','admin','2023-05-01','2023-05-01',1,1);
+ ('blockMe','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaaa@gmail.com','regular','2023-05-01','2023-05-01',1,1);
 
 INSERT INTO messages (from_user_id,to_user_id,msg, sent_at, read) 
 VALUES (1,2,'first message', '2023-06-07 15:30:00+00:00', true), 
@@ -86,3 +86,11 @@ FROM (
 WHERE rn = 1 ORDER BY read ASC;
 
 --query to get the unread messages
+
+--query to get list of users that a user has contacted or contacted by
+SELECT DISTINCT CASE
+    WHEN from_user_id = 3 THEN to_user_id
+    WHEN to_user_id = 3 THEN from_user_id
+END AS user_id
+FROM messages
+WHERE from_user_id = 3 OR to_user_id = 3;

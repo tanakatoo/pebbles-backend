@@ -50,18 +50,13 @@ CREATE TABLE goals(
     name VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE goals_users(
-    goal_id INTEGER  NOT NULL,
-    user_id INTEGER  NOT NULL,
-    PRIMARY KEY (goal_id, user_id)
-);
 
 CREATE TABLE motivation_levels(
     id SERIAL PRIMARY KEY,
     name varchar(50) NOT NULL
 );
 
-CREATE TABLE study_time(
+CREATE TABLE study_times(
     id SERIAL PRIMARY KEY,
     name varchar(50) NOT NULL
 );
@@ -101,15 +96,28 @@ CREATE TABLE users(
     about TEXT,
     myway_habits TEXT,
     myway_motivation_level_id INTEGER REFERENCES motivation_levels(id) ON DELETE SET NULL,
-    myway_study_time_id INTEGER REFERENCES study_time(id) ON DELETE SET NULL,
+    myway_study_time_id INTEGER REFERENCES study_times(id) ON DELETE SET NULL,
     study_buddy_bio TEXT,
-    study_buddy_type_id INTEGER REFERENCES study_buddy_types(id) ON DELETE SET NULL,
     study_buddy_native_language_id INTEGER REFERENCES languages(id) ON DELETE SET NULL,
     study_buddy_learning_language_id INTEGER REFERENCES languages(id) ON DELETE SET NULL,
     study_buddy_language_level_id INTEGER REFERENCES language_levels(id) ON DELETE SET NULL,
     study_buddy_timezone_id INTEGER REFERENCES timezones(id) ON DELETE SET NULL,
     study_buddy_age_range_id INTEGER REFERENCES age_ranges(id) ON DELETE SET NULL,
-    study_buddy_active BOOLEAN NOT NULL DEFAULT false
+    study_buddy_active BOOLEAN NOT NULL DEFAULT false,
+    study_buddy_activate_date DATE NOT NULL DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE study_buddy_types_users(
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    study_buddy_type_id INTEGER NOT NULL REFERENCES study_buddy_types(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, study_buddy_type_id)
+);
+
+
+CREATE TABLE goals_users(
+    goal_id INTEGER  NOT NULL,
+    user_id INTEGER  NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    PRIMARY KEY (goal_id, user_id)
 );
 
 CREATE TABLE sub_accts(
@@ -127,7 +135,7 @@ CREATE TABLE messages(
     to_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     msg TEXT NOT NULL,
     read BOOLEAN NOT NULL DEFAULT false,
-    sent_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    sent_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc')
 );
 
 CREATE INDEX idx_date ON messages (sent_at DESC);

@@ -26,8 +26,8 @@ async function authenticateJWT(req, res, next) {
             res.locals.user = jwt.verify(token, SECRET_KEY);
             console.log('got token verified, id is', res.locals.user.id)
 
-            const role = await User.getRole(res.locals.user.id)
-            res.locals.user.role = role
+            const result = await User.getRole(res.locals.user.id)
+            res.locals.user.role = result.role
             console.log('locals user is', res.locals.user)
             req.loggedIn = true //if jwt.verify is correct, it will continue down to this line so we set loggedIn = true
 
@@ -97,6 +97,7 @@ function ensureAdmin(req, res, next) {
 /** Middleware to check if they have a valid token & is user matching
  *  username provided as route param.
  *Adds to the request object whether the logged in user is the correct user to view resource
+ does not throw error if not admin or correct user
  */
 
 function isCorrectUserOrAdmin(req, res, next) {
@@ -104,7 +105,6 @@ function isCorrectUserOrAdmin(req, res, next) {
         const user = res.locals.user;
 
         if (!(user && (user.role === "admin" || user.username === req.params.username))) {
-            // throw new UnauthorizedError();
             req.correctUser = false
         } else {
             req.correctUser = true
@@ -115,27 +115,27 @@ function isCorrectUserOrAdmin(req, res, next) {
     }
 }
 
-/** Middleware to check if it is user matching
- *  user id in body
+/**NO USER FOR THIS?? 
+ * Middleware to check if it is user is admin or is logged in
+ * 
  *
  * returns unauthorized if not
  */
 
-function isMustBeCorrectUserOrAdmin(req, res, next) {
-    try {
-        const user = res.locals.user;
-        console.log('req body id is', req.body.id)
-        console.log('logged in use rid is', user.id)
-        console.log('loggd in user', user)
-        if (!(user && (user.role === "admin" || user.id === req.body.id))) {
-            throw new UnauthorizedError();
+// function isMustBeCorrectUserOrAdmin(req, res, next) {
+//     try {
+//         const user = res.locals.user;
+//         console.log('res locals id is', user)
 
-        }
-        return next();
-    } catch (err) {
-        return next(err);
-    }
-}
+//         if (!(user && user.role === "admin")) {
+//             throw new UnauthorizedError();
+
+//         }
+//         return next();
+//     } catch (err) {
+//         return next(err);
+//     }
+// }
 
 /*See if token is the same as the user being requested 
 token provided 
@@ -147,5 +147,5 @@ module.exports = {
     isMustBeLoggedIn,
     ensureAdmin,
     isCorrectUserOrAdmin,
-    isMustBeCorrectUserOrAdmin
+    // isMustBeCorrectUserOrAdmin
 };

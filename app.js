@@ -5,6 +5,7 @@ const userRoutes = require('./routes/userRoutes')
 const authRoutes = require('./routes/authRoutes');
 const messageRoutes = require('./routes/messageRoutes')
 const locationRoutes = require("./routes/externalApiRoutes")
+const studybuddyRoutes = require("./routes/studybuddyRoutes")
 // const mailchimpTx = require("@mailchimp/mailchimp_transactional")(process.env.MAILCHIMP_API_KEY)
 const app = express();
 const sendEmail = require('./helpers/emailing')
@@ -16,6 +17,7 @@ app.use('/users', userRoutes)
 app.use('/auth', authRoutes)
 app.use('/external/api', locationRoutes)
 app.use('/messages', messageRoutes)
+app.use('/study-buddies', studybuddyRoutes)
 
 // sendEmail()
 
