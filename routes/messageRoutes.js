@@ -44,6 +44,24 @@ router.get('/', authenticateJWT, isMustBeLoggedIn, async (req, res, next) => {
     }
 })
 
+/**to implement
+ * For logged in user to get the latest messages from all their connections
+ * 
+ * returns [{from_user_id, to_user_id,msg,sent_at,read}]
+ */
+router.get('/search', authenticateJWT, isMustBeLoggedIn, async (req, res, next) => {
+    //need to check that the to_user has not blocked this user
+    try {
+
+        const result = await Message.getLatestMessageList(res.locals.user.id)
+        return res.status(200).json(result)
+
+    } catch (e) {
+        console.log('in blocked user routes,', e)
+        return next(e)
+    }
+})
+
 /**works
  * For logged in user to get all the messages for one user
  * 

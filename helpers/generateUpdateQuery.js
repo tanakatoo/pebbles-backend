@@ -13,7 +13,7 @@ async function generateUpdateQuery(data, fromTableName, columnName, query, value
             throw new NotFoundError
         }
 
-        query += index == 2 ? '' : ','
+        query += index == 1 ? '' : ','
         query += ` ${columnName}= $${index}`
         index++
         values.push(id.rows[0].id)
@@ -94,58 +94,42 @@ async function updateManyToMany(data, id, tableName, manyTableName, col1, col2) 
 };
 
 async function insertCountryStateCity(dataEN, dataJA, tableName, userCol, id = null, col = null, query, values, index) {
-    if (dataEN && dataJA) {
-        let colName = '';
-        let parameter = '';
-        let parameterArray = [dataEN, dataJA];
 
-        if (id) {
-            //we want to insert an extra piece of data
-            colName = `, ${col}`
-            parameter = ',$3'
-            parameterArray.push(id)
-            console.log('not here')
-        };
+    let colName = '';
+    let parameter = '';
+    let parameterArray = [dataEN, dataJA];
 
-        //if already in db, we just return the id, otherwise we insert it
-        let returnid;
+    if (id) {
+        //we want to insert an extra piece of data
+        colName = `, ${col}`
+        parameter = ',$3'
+        parameterArray.push(id)
+
+    };
+
+    //if already in db, we just return the id, otherwise we insert it
+    let returnid;
+    returnid = await db.query(
+        `SELECT id FROM ${tableName} WHERE name_en=$1`, [dataEN]
+    );
+
+    if (!returnid.rows.length > 0) {
         returnid = await db.query(
-            `SELECT id FROM ${tableName} WHERE name_en=$1`, [dataEN]
-        );
-
-        if (!returnid.rows.length > 0) {
-            returnid = await db.query(
-                `INSERT INTO ${tableName} (name_en,name_ja ${colName})
+            `INSERT INTO ${tableName} (name_en,name_ja ${colName})
             (SELECT CAST($1 AS VARCHAR),$2 ${parameter}) RETURNING id
             `, parameterArray
-            );
-        };
+        );
+    };
 
-        query += index == 2 ? '' : ',';
-        query += ` ${userCol}= $${index}`;
-        index++;
+    query += index == 1 ? '' : ',';
+    query += ` ${userCol}= $${index}`;
+    index++;
 
-        values.push(returnid.rows[0].id);
-        console.log('values in function is', values);
-        console.log('query is', query)
-        return [query, values, index, returnid.rows[0].id];
-    } else {
-        //there's no data that means delete
-        //if it is a country, we delete all country, state, city
-        //if it is a state, we delete state, city
-        //if it is a city, we delete just city
-        if (tableName == "countries") {
-            query += ` ${userCol}= $${index}`;
-            index++;
-            values.push(null)
-        }
-        return [query, values, index, null];
-    }
-}
-
-async function deleteCountryStateCity() {
+    values.push(returnid.rows[0].id);
+    return [query, values, index, returnid.rows[0].id];
 
 }
+
 
 module.exports = {
     generateUpdateQuery,

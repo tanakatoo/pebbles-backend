@@ -6,6 +6,7 @@ function generateToken(id, username) {
         id: id,
         username: username
     }
+    console.log('payoad is', id, username, SECRET_KEY)
     return jwt.sign(payload, SECRET_KEY)
 }
 

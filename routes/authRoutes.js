@@ -25,14 +25,17 @@ router.post('/login', async (req, res, next) => {
         }
         const { username, password } = req.body
         //see if identifier is an email
-        let user
+        let userToken
         if (validatorPkg.isEmail(username)) {
-            user = await User.login(null, username, password)
+            userToken = await User.login(null, username, password)
         } else {
-            user = await User.login(username, null, password)
+            userToken = await User.login(username, null, password)
         }
         //return token
-        const token = generateToken(user.id, user.username, user.role)
+        const token = generateToken(userToken.id, userToken.username, userToken.role)
+
+        //get private profile and return that
+        const user = await User.getPrivate(userToken.id)
         return res.status(201).json({ token, user })
     } catch (e) {
         return next(e)

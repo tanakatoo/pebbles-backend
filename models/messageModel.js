@@ -52,7 +52,7 @@ class Message {
         //get a list of users that the logged in user has messages for and filter out those that the user has blocked
         //this is so users can block more users
         const latestMessageList = await db.query(
-            `SELECT from_user_id, to_user_id, msg, sent_at, read
+            `SELECT uTo.avatar as toAvatar, uFrom.avatar as fromAvatar, uFrom.username as from ,uTo.username as to, subquery.from_user_id, subquery.to_user_id, subquery.msg, subquery.sent_at, subquery.read
             FROM(
                 SELECT 
             from_user_id, to_user_id, msg, sent_at, read,
@@ -71,6 +71,8 @@ class Message {
                             WHERE user_id = $1)) as subsubquery
           WHERE $1 IN(from_user_id, to_user_id)
         ) AS subquery
+        INNER JOIN users uFrom on uFrom.id=subquery.from_user_id
+        INNER JOIN users uTo on uTo.id=subquery.to_user_id
         WHERE rn = 1 ORDER BY read ASC`, [id]
         )
 

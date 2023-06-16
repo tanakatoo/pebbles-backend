@@ -39,7 +39,6 @@ class User {
             WHERE from_user_id = $1 OR to_user_id = $1`, [id]
         )
 
-        console.log(listOfUsers.rows)
         return listOfUsers.rows;
     }
 
@@ -53,9 +52,9 @@ class User {
             FROM users
             WHERE id=$1`, [id]
         )
-        console.log('in getting role, role is', result.rows[0])
+
         if (!result.rows[0]) {
-            console.log('not found?')
+
             throw new NotFoundError
         }
         return result.rows[0]
@@ -75,8 +74,6 @@ class User {
         const listOfBlockedUsers = await db.query(
             `SELECT blocked_user_id FROM blocked_users 
             WHERE user_id = $1`, [id])
-
-        console.log(listOfBlockedUsers.rows)
         return listOfBlockedUsers.rows;
     }
 
@@ -96,7 +93,6 @@ class User {
         const result = await db.query(
             `INSERT INTO blocked_users (user_id,blocked_user_id) values($1,$2)`, [id, user_id])
 
-        console.log(result.rows)
         return result.rows[0];
     }
 
@@ -117,7 +113,6 @@ class User {
             `DELETE FROM blocked_users WHERE user_id=$1 and blocked_user_id=$2`, [id, user_id]
         )
 
-        console.log(unblockUser)
         return unblockUser;
     }
 
@@ -186,14 +181,17 @@ class User {
         const query = username ? 'username' : 'email'
         const queryData = username ? username : email
         const result = await db.query(
-            `${privateBaseQuery}
+            `SELECT username, role, password, id 
+            FROM users
                WHERE ${query} = $1`,
             [queryData],
         );
-        console.log('got result', result.rows)
+
         const user = result.rows[0];
 
         if (user) {
+            console.log('in user model', user)
+            console.log(password, user.password)
             // compare hashed password to a new hash from password
             const isValid = await bcrypt.compare(password, user.password);
             if (isValid === true) {
@@ -238,7 +236,6 @@ class User {
             `, [user_id, save_id]
         )
 
-        console.log(result)
         return "success";
     }
 
@@ -287,9 +284,9 @@ class User {
         //data can be an array
         //use Object.keys(object).find(key => object[key] === value); in the frontend
         //so we replace the info in the incoming data to IDs to be saved and then create a query from that
-        let index = 2;
+        let index = 1;
         let query = '';
-        let values = [id];
+        let values = [];
         [query, values, index] = await generateUpdateQuery(data.gender, 'genders', 'gender_id', query, values, index);
         [query, values, index] = await generateUpdateQuery(data.timezone, 'timezones', 'study_buddy_timezone_id', query, values, index);
         [query, values, index] = await generateUpdateQuery(data.age, 'age_ranges', 'study_buddy_age_range_id', query, values, index);
@@ -321,35 +318,39 @@ class User {
         //if we have an english version, we will have a japanese version
 
         //if no country specified, then set column to null
-        let country_id = 0
-        let state_id = 0
-        let city_id = 0
+        let country_id = 0;
+        let state_id = 0;
+        let city_id = 0;
         if (data.country_en && data.country_ja) {
             [query, values, index, country_id] = await insertCountryStateCity(data.country_en, data.country_ja, 'countries', 'country_id', null, null, query, values, index);
+
             if (data.state_en && data.state_ja) {
-                [query, values, index, state_id] = await insertCountryStateCity(data.state_en, data.state_ja, 'states', 'state_id', country_id, 'country_id', query, values, index)
+                [query, values, index, state_id] = await insertCountryStateCity(data.state_en, data.state_ja, 'states', 'state_id', country_id, 'country_id', query, values, index);
                 if (data.city_en && data.city_ja) {
                     [query, values, index, city_id] = await insertCountryStateCity(data.city_en, data.city_ja, 'cities', 'city_id', state_id, 'state_id', query, values, index);
                 } else {
                     query += `, city_id=$${index}`;
-                    values.push(null)
-                }
+                    index++
+                    values.push(null);
+                };
             }
             else {
                 query += `, state_id=$${index}, city_id=$${index + 1}`;
-                values.push(null)
-                values.push(null)
-            }
+                values.push(null);
+                values.push(null);
+                index = index + 2
+            };
         } else {
             query += `, country_id= $${index}, state_id=$${index + 1}, city_id=$${index + 2}`;
-            values.push(null)
-            values.push(null)
-            values.push(null)
-        }
+            values.push(null);
+            values.push(null);
+            values.push(null);
+            index = index + 3
+        };
 
-        console.log('query end', query)
-        console.log('values end', values)
 
+        //add id to the end of values
+        values.push(id)
         /** test query
          * {"gender":"other","timezone":"HongKong", "age":"26-35","motivation_level":"Very", "study_time":"everyday","native_language":"English","learning_language":"Japanese","study_buddy_types":["StudyBuddy","LanguageExchange"],"language_level":"Intermediate","first_name":"OMG", "last_name":"oommgg","study_buddy_active":true,"about":"testing about","myway_habits":"my habits","study_buddy_bio":"the bio","goals":["Pronunciation"], "country_en":"new country","country_ja":"jap new c","state_en":"new state","state_ja":"jap new state", "city_en":"new city","city_ja":"jap new city"}
          */
@@ -359,7 +360,7 @@ class User {
         const resultsUsers = db.query(
             `UPDATE users 
             SET ${query} 
-            WHERE id = $1`, values
+            WHERE id = $${index}`, values
         );
 
         await updateManyToMany(data.goals, id, 'goals', 'goals_users', 'user_id', 'goal_id')
