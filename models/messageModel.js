@@ -23,7 +23,7 @@ class Message {
     static async sendMsg(id, username, msg) {
 
         const user_id = await getUserID(username)
-
+        console.log('in msg model', id, username, msg)
         //did user block me
         //returns false, but it throws error if logged user is blocked
         const userBlockedMe = await blockedUser(id, user_id, id)
@@ -36,7 +36,7 @@ class Message {
             `INSERT INTO messages (from_user_id, to_user_id,msg)
             VALUES ($1,$2,$3) RETURNING from_user_id, to_user_id, msg, sent_at`, [id, user_id, msg]
         )
-
+        console.log('insert already, returning this', result)
         return result.rows[0]
     }
 
@@ -94,23 +94,32 @@ class Message {
         //should not throw error as there is no ui to display messages of blocked user
         const iBlockedUser = await blockedUser(user_id, id, user_id)
 
-
         //get a list of users that the logged in user has messages for and filter out those that the user has blocked
         //this is so users can block more users
         const messages = await db.query(
-            `SELECT *
-            FROM messages
-            WHERE (from_user_id=$1 AND to_user_id=$2)
-                OR (from_user_id=$2 AND to_user_id=$1)
-            ORDER BY sent_at ASC`, [id, user_id]
+            `SELECT uTo.avatar as toAvatar, uFrom.avatar as fromAvatar, 
+            uFrom.username as from ,uTo.username as to, 
+            m.from_user_id, m.to_user_id, m.msg, m.sent_at, m.read
+            FROM messages m
+            INNER JOIN users uFrom on uFrom.id=m.from_user_id
+            INNER JOIN users uTo on uTo.id=m.to_user_id
+            WHERE (m.from_user_id=$1 AND m.to_user_id=$2)
+                OR (m.from_user_id=$2 AND m.to_user_id=$1)
+            
+            ORDER BY sent_at DESC`, [id, user_id]
         )
 
         console.log(messages.rows)
+
+
+        //now we set all of the flags to "read" for the logged in user
+        const setRead = await db.query(
+            `UPDATE messages SET read=true 
+            WHERE (from_user_id=$2 AND to_user_id=$1)`, [id, user_id]
+        )
+        console.log(setRead)
         return messages.rows;
     }
-
-
-
 }
 
 

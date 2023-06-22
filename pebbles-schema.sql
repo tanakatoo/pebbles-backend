@@ -88,6 +88,7 @@ CREATE TABLE users(
     role VARCHAR(20) NOT NULL DEFAULT 'regular',
     sign_up_date DATE NOT NULL DEFAULT CURRENT_DATE,
     last_login_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    free_trial_start_date DATE,
     country_id INTEGER REFERENCES countries(id) ON DELETE SET NULL,
     city_id INTEGER REFERENCES cities(id) ON DELETE SET NULL,
     state_id INTEGER REFERENCES states(id) ON DELETE SET NULL,
@@ -100,6 +101,7 @@ CREATE TABLE users(
     myway_used BOOLEAN DEFAULT false,
     myway_motivation_level_id INTEGER REFERENCES motivation_levels(id) ON DELETE SET NULL,
     myway_study_time_id INTEGER REFERENCES study_times(id) ON DELETE SET NULL,
+    study_buddy_purpose TEXT,
     study_buddy_bio TEXT,
     study_buddy_native_language_id INTEGER REFERENCES languages(id) ON DELETE SET NULL,
     study_buddy_learning_language_id INTEGER REFERENCES languages(id) ON DELETE SET NULL,
@@ -138,7 +140,7 @@ CREATE TABLE messages(
     to_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     msg TEXT NOT NULL,
     read BOOLEAN NOT NULL DEFAULT false,
-    sent_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc')
+    sent_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (current_timestamp AT TIME ZONE 'UTC')
 );
 
 CREATE INDEX idx_date ON messages (sent_at DESC);

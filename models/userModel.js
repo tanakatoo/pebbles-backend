@@ -21,7 +21,7 @@ class User {
     /** WORKS 
      * Get all users that the logged in user has messaged without the blocked users
      * (used for blocking additional users)
-     * Returns [id] on success
+     * Returns [id, username, avatar] of contacts on success
      *
      **/
 
@@ -34,9 +34,25 @@ class User {
                 CASE
                     WHEN from_user_id = $1 THEN to_user_id
                     WHEN to_user_id = $1 THEN from_user_id
-                END AS user_id
-            FROM messages
-            WHERE from_user_id = $1 OR to_user_id = $1`, [id]
+                END AS user_id, 
+                u.username, 
+                u.avatar
+            FROM messages m
+            INNER JOIN users u on u.id= 
+                                    CASE
+                                        WHEN m.from_user_id = $1 THEN m.to_user_id
+                                        WHEN m.to_user_id = $1 THEN m.from_user_id
+                                    END
+            WHERE (m.from_user_id = $1 OR m.to_user_id = $1)
+                AND m.to_user_id not in (
+                    SELECT blocked_user_id 
+                    FROM blocked_users 
+                    WHERE user_id = $1) 
+                AND 
+                    m.from_user_id not in (
+                        SELECT blocked_user_id 
+                        FROM blocked_users 
+                        WHERE user_id = $1)`, [id]
         )
 
         return listOfUsers.rows;
@@ -72,7 +88,9 @@ class User {
         //get a list of users that the logged in user has messages for and filter out those that the user has blocked
         //this is so users scan block more users
         const listOfBlockedUsers = await db.query(
-            `SELECT blocked_user_id FROM blocked_users 
+            `SELECT b.blocked_user_id, u.username, u.avatar 
+            FROM blocked_users b
+            INNER JOIN users u ON u.id=b.blocked_user_id
             WHERE user_id = $1`, [id])
         return listOfBlockedUsers.rows;
     }
@@ -379,12 +397,12 @@ class User {
      * Throws NotFoundError if user not found.
      **/
 
-    static async getPrivate(id) {
+    static async getPrivate(username) {
 
         const userRes = await db.query(
             `${privateBaseQuery}
-            WHERE u.id = $1`,
-            [id],
+            WHERE u.username = $1`,
+            [username],
         );
 
         const user = userRes.rows[0];
@@ -392,9 +410,9 @@ class User {
         if (!user) throw new NotFoundError('NOT_FOUND');
         delete user.password
 
-        const studyBuddies = await getManyToManyData('study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id', id)
+        const studyBuddies = await getManyToManyData('study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id', user.id)
         user.study_buddy_types = studyBuddies.map(a => a.name)
-        const goals = await getManyToManyData('goals', 'goals_users', 'user_id', 'goal_id', id)
+        const goals = await getManyToManyData('goals', 'goals_users', 'user_id', 'goal_id', user.id)
         user.goals = goals.map(a => a.name)
 
         return user;
@@ -402,6 +420,7 @@ class User {
 
 
     static async getPublic(username) {
+
         const userRes = await db.query(
             `${baseQuery}
             WHERE u.username = $1`,
@@ -409,9 +428,11 @@ class User {
         );
 
         const user = userRes.rows[0];
-        if (!user) throw new NotFoundError(`NOT_FOUND`);
-
-        const studyBuddies = await getManyToManyData('study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id', id)
+        if (!user) {
+            throw new NotFoundError(`NOT_FOUND`);
+        }
+        console.log(user)
+        const studyBuddies = await getManyToManyData('study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id', user.id)
         user.study_buddy_types = studyBuddies.map(a => a.name)
         return user;
     }

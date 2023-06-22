@@ -13,8 +13,10 @@ const Message = require('../models/messageModel')
 router.post('/:username/send', authenticateJWT, isMustBeLoggedIn, async (req, res, next) => {
     //need to check that the to_user has not blocked this user
     try {
+
         const { msg } = req.body
         const { username } = req.params
+        console.log('in msg route', msg, username, res.locals.user.id)
         const result = await Message.sendMsg(res.locals.user.id, username, msg)
         return res.status(201).json(result)
 
@@ -45,7 +47,7 @@ router.get('/', authenticateJWT, isMustBeLoggedIn, async (req, res, next) => {
 })
 
 /**to implement
- * For logged in user to get the latest messages from all their connections
+ * For logged in user to search in their contacts
  * 
  * returns [{from_user_id, to_user_id,msg,sent_at,read}]
  */

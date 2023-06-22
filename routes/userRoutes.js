@@ -191,10 +191,10 @@ router.get('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, res,
         const loggedIn = req.loggedIn
         const isCorrectUser = req.correctUser
         const username = req.params.username
-
+        console.log(loggedIn, isCorrectUser, username)
         if (loggedIn && isCorrectUser) {
-            //user is logged in and accessing their own profile
-            userData = await User.getPrivate(res.locals.user.id)
+            console.log('getting private becauwe i am admin', username)
+            userData = await User.getPrivate(username)
         } else {
             //user is logged in or not but accessing someone else's profile
             userData = await User.getPublic(username)
