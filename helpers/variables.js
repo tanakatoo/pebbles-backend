@@ -10,6 +10,7 @@ const baseQuery = `SELECT u.username,
                         states.name_ja as state_ja,
                         genders.name as gender,
                         u.about,
+                        u.free_trial_start_date,
                         u.study_buddy_bio,
                         u.study_buddy_purpose,
                         l.name as native_language,
@@ -63,7 +64,8 @@ const privateBaseQuery = `SELECT u.id,
                         tz.name as time_zone,
                         a.name as age_range,
                         u.study_buddy_active,
-                        u.study_buddy_purpose
+                        u.study_buddy_purpose,
+                        u.free_trial_start_date
                         FROM users u
                         LEFT JOIN countries c on c.id=u.country_id
                         LEFT JOIN cities on cities.id=u.city_id

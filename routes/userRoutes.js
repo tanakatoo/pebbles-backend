@@ -171,7 +171,7 @@ router.patch('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, re
 
         if (user == 'done') {
             //get all user data
-            user = await User.getPrivate(res.locals.user.id)
+            user = await User.getPrivate(res.locals.user.username)
         }
         return res.status(200).json(user)
 
@@ -195,6 +195,7 @@ router.get('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, res,
         if (loggedIn && isCorrectUser) {
             console.log('getting private becauwe i am admin', username)
             userData = await User.getPrivate(username)
+            userData.myProfile = true
         } else {
             //user is logged in or not but accessing someone else's profile
             userData = await User.getPublic(username)

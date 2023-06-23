@@ -35,7 +35,7 @@ router.post('/login', async (req, res, next) => {
         const token = generateToken(userToken.id, userToken.username, userToken.role)
 
         //get private profile and return that
-        const user = await User.getPrivate(userToken.id)
+        const user = await User.getPrivate(userToken.username)
         return res.status(201).json({ token, user })
     } catch (e) {
         return next(e)

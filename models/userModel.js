@@ -321,6 +321,7 @@ class User {
         [query, values, index] = addTextValuesToQuery(data.myway_habits, 'myway_habits', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.study_buddy_bio, 'study_buddy_bio', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.study_buddy_active, 'study_buddy_active', query, values, index);
+        [query, values, index] = addTextValuesToQuery(data.study_buddy_purpose, 'study_buddy_purpose', query, values, index);
 
         if (data.study_buddy_active && data.study_buddy_active === true) {
             //also add activate date
@@ -404,7 +405,7 @@ class User {
             WHERE u.username = $1`,
             [username],
         );
-
+        console.log('username is', username)
         const user = userRes.rows[0];
 
         if (!user) throw new NotFoundError('NOT_FOUND');
@@ -414,7 +415,7 @@ class User {
         user.study_buddy_types = studyBuddies.map(a => a.name)
         const goals = await getManyToManyData('goals', 'goals_users', 'user_id', 'goal_id', user.id)
         user.goals = goals.map(a => a.name)
-
+        console.log(user)
         return user;
     }
 
