@@ -189,7 +189,7 @@ class User {
 
     /** login user with username or email, password.
      *
-     * Returns { id, username, first_name, last_name, email, is_admin }
+     * Returns { id, username, name, email, is_admin }
      *
      * Throws UnauthorizedError is user not found or wrong password.
      **/
@@ -315,8 +315,7 @@ class User {
         [query, values, index] = await generateUpdateQuery(data.learning_language, 'languages', 'study_buddy_learning_language_id', query, values, index);
 
         //add other text into query
-        [query, values, index] = addTextValuesToQuery(data.first_name, 'first_name', query, values, index);
-        [query, values, index] = addTextValuesToQuery(data.last_name, 'last_name', query, values, index);
+        [query, values, index] = addTextValuesToQuery(data.name, 'name', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.about, 'about', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.myway_habits, 'myway_habits', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.study_buddy_bio, 'study_buddy_bio', query, values, index);
@@ -371,11 +370,13 @@ class User {
         //add id to the end of values
         values.push(id)
         /** test query
-         * {"gender":"other","timezone":"HongKong", "age":"26-35","motivation_level":"Very", "study_time":"everyday","native_language":"English","learning_language":"Japanese","study_buddy_types":["StudyBuddy","LanguageExchange"],"language_level":"Intermediate","first_name":"OMG", "last_name":"oommgg","study_buddy_active":true,"about":"testing about","myway_habits":"my habits","study_buddy_bio":"the bio","goals":["Pronunciation"], "country_en":"new country","country_ja":"jap new c","state_en":"new state","state_ja":"jap new state", "city_en":"new city","city_ja":"jap new city"}
+         * {"gender":"other","timezone":"HongKong", "age":"26-35","motivation_level":"Very", "study_time":"everyday","native_language":"English","learning_language":"Japanese","study_buddy_types":["StudyBuddy","LanguageExchange"],"language_level":"Intermediate","name":"OMG","study_buddy_active":true,"about":"testing about","myway_habits":"my habits","study_buddy_bio":"the bio","goals":["Pronunciation"], "country_en":"new country","country_ja":"jap new c","state_en":"new state","state_ja":"jap new state", "city_en":"new city","city_ja":"jap new city"}
          */
 
         //update users table this works
-
+        console.log('this is the query', `UPDATE users 
+SET ${query} 
+WHERE id = $${index}`, values)
         const resultsUsers = db.query(
             `UPDATE users 
             SET ${query} 
@@ -392,7 +393,7 @@ class User {
 
     /** Given a username, return data about user.
      *
-     * Returns { username, first_name, last_name, is_admin, jobs }
+     * Returns { username, name, is_admin, jobs }
      *   where jobs is { id, title, company_handle, company_name, state }
      *
      * Throws NotFoundError if user not found.

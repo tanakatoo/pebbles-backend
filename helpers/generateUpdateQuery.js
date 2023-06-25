@@ -1,5 +1,6 @@
 const db = require("../db")
 const { NotFoundError } = require("../error")
+const pg = require('pg')
 
 async function generateUpdateQuery(data, fromTableName, columnName, query, values, index) {
 
@@ -22,7 +23,17 @@ async function generateUpdateQuery(data, fromTableName, columnName, query, value
 }
 
 function addTextValuesToQuery(data, columnName, query, values, index) {
+
+    //need to escape the apostrophes
     if (data) {
+        //find if there is an apostrophe
+        console.log('index of data finding aposophe is', data.indexOf("'"))
+        if (data.indexOf("'") !== -1) {
+            console.log('found apostophe')
+            data = pg.escapeLiteral(data)
+            // data = data.slice(0, data.indexOf("'")) + "\'\'" + data.slice(data.indexOf("'"))
+        }
+        console.log('this is the text data to add', data)
         query += `, ${columnName}=$${index}`;
         values.push(data);
         index++;

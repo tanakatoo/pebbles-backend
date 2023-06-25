@@ -81,8 +81,7 @@ CREATE TABLE users(
     username VARCHAR(25) UNIQUE NOT NULL,
     password TEXT NOT NULL,
     premium_acct_id INTEGER REFERENCES premium_accts(id) ON DELETE SET NULL,
-    first_name VARCHAR(100),
-    last_name VARCHAR(100),
+    name VARCHAR(100),
     email TEXT NOT NULL
         CHECK (position('@' IN email) > 1),
     role VARCHAR(20) NOT NULL DEFAULT 'regular',
@@ -129,8 +128,7 @@ CREATE TABLE sub_accts(
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id),
   premium_acct_id INTEGER REFERENCES premium_accts(id) ON DELETE CASCADE,
-  first_name VARCHAR(100) NOT NULL,
-  last_name VARCHAR(100),
+  name VARCHAR(100) NOT NULL,
   age_range_id INTEGER REFERENCES age_ranges(id) ON DELETE SET NULL
 );
 

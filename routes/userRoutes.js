@@ -160,7 +160,7 @@ router.get('/saved', authenticateJWT, isMustBeLoggedIn, async (req, res, next) =
  * 
  */
 router.patch('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, res, next) => {
-
+    console.log('in patching data, body is', req.body)
     try {
         if (req.correctUser == false) {
             throw new UnauthorizedError

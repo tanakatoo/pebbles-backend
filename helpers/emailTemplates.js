@@ -1,5 +1,6 @@
 function resetPassword(to, name, type, lang, link = '', ...extras) {
-    return (`
+    console.log('sending email to this name and this is the link', name, link)
+    const x = (`
         <table cellspacing="0" cellpadding="0" style="background-color: #F2F2F2; border: 1px solid #eee; width: 100%;">
     <tbody>
         <tr>
@@ -52,6 +53,8 @@ function resetPassword(to, name, type, lang, link = '', ...extras) {
 </table>
 <div><br></div>`
     )
+    console.log(x)
+    return x
 }
 
 module.exports = { resetPassword } 

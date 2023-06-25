@@ -73,15 +73,16 @@ class Message {
         ) AS subquery
         INNER JOIN users uFrom on uFrom.id=subquery.from_user_id
         INNER JOIN users uTo on uTo.id=subquery.to_user_id
-        WHERE rn = 1 ORDER BY read ASC`, [id]
+        WHERE rn = 1
+        ORDER BY read ASC, sent_at`, [id]
         )
 
         return latestMessageList.rows;
     }
 
-    /** Get all users that the logged in user has messaged and the latest message without the blocked users
+    /** Get conversation for logged in user and anothe ruser
              *
-             * Returns [from_user_name,to_user_name, msg, sent_at] on success ordered by unread first
+             * Returns [from_user_name,to_user_name, msg, sent_at] on success ordered by latest date
              *
              **/
 
