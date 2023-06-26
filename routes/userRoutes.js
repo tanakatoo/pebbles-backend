@@ -168,11 +168,12 @@ router.patch('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, re
 
         const id = res.locals.user.id
         let user = await User.update(id, req.body)
-
-        if (user == 'done') {
+        console.log('saving patch data')
+        if (user === 'done') {
             //get all user data
             user = await User.getPrivate(res.locals.user.username)
         }
+        console.log(user)
         return res.status(200).json(user)
 
     } catch (e) {

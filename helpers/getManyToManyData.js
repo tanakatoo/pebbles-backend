@@ -17,6 +17,6 @@ async function getManyToManyData(tableName, manyTableName, col1, col2, id) {
         INNER JOIN ${manyTableName} m on m.${col2}=a.id
         WHERE m.${col1}=$1`, [id]
     );
-    return names.rows
+    return names.rows;
 }
 module.exports = { getManyToManyData }

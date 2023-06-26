@@ -97,6 +97,7 @@ CREATE TABLE users(
     avatar VARCHAR(50) DEFAULT floor(random() *14+1)::varchar || '.jpg',
     myway_habits TEXT,
     myway_advice TEXT,
+    myway_language_level_id INTEGER REFERENCES language_levels(id) ON DELETE SET NULL,
     myway_used BOOLEAN DEFAULT false,
     myway_motivation_level_id INTEGER REFERENCES motivation_levels(id) ON DELETE SET NULL,
     myway_study_time_id INTEGER REFERENCES study_times(id) ON DELETE SET NULL,

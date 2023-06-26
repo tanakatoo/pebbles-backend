@@ -9,31 +9,25 @@ async function generateUpdateQuery(data, fromTableName, columnName, query, value
             `SELECT id 
                 FROM ${fromTableName}
                 WHERE name=$1`, [data]
-        )
+        );
         if (id.rows.length === 0) {
-            throw new NotFoundError
-        }
+            throw new NotFoundError;
+        };
 
-        query += index == 1 ? '' : ','
-        query += ` ${columnName}= $${index}`
-        index++
-        values.push(id.rows[0].id)
-    }
-    return [query, values, index]
+        query += index === 1 ? '' : ',';
+        query += ` ${columnName}= $${index}`;
+        index = index + 1;
+        values.push(id.rows[0].id);
+
+    };
+
+    return [query, values, index];
 }
 
-function addTextValuesToQuery(data, columnName, query, values, index) {
 
-    //need to escape the apostrophes
+
+function addTextValuesToQuery(data, columnName, query, values, index) {
     if (data) {
-        //find if there is an apostrophe
-        console.log('index of data finding aposophe is', data.indexOf("'"))
-        if (data.indexOf("'") !== -1) {
-            console.log('found apostophe')
-            data = pg.escapeLiteral(data)
-            // data = data.slice(0, data.indexOf("'")) + "\'\'" + data.slice(data.indexOf("'"))
-        }
-        console.log('this is the text data to add', data)
         query += `, ${columnName}=$${index}`;
         values.push(data);
         index++;
@@ -71,7 +65,7 @@ async function updateManyToMany(data, id, tableName, manyTableName, col1, col2) 
                         FROM ${tableName}
                         WHERE name = $1`, [i]
             );
-
+            console.log(ids.rows[0])
             return ids.rows[0].id;
         }));
 
@@ -120,6 +114,7 @@ async function insertCountryStateCity(dataEN, dataJA, tableName, userCol, id = n
 
     //if already in db, we just return the id, otherwise we insert it
     let returnid;
+
     returnid = await db.query(
         `SELECT id FROM ${tableName} WHERE name_en=$1`, [dataEN]
     );

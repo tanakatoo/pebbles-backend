@@ -13,7 +13,8 @@ const { baseQuery, privateBaseQuery } = require('../helpers/variables')
 const { generateUpdateQuery,
     addTextValuesToQuery,
     updateManyToMany,
-    insertCountryStateCity } = require('../helpers/generateUpdateQuery')
+    insertCountryStateCity,
+    addIDsToQuery } = require('../helpers/generateUpdateQuery')
 const { getManyToManyData } = require('../helpers/getManyToManyData')
 class User {
 
@@ -305,11 +306,19 @@ class User {
         let index = 1;
         let query = '';
         let values = [];
+
+        /**
+         * generateUpdateQuery
+         * parameters(data to update, get data from which table, column name in users table, query, values, index)
+    
+         */
+
         [query, values, index] = await generateUpdateQuery(data.gender, 'genders', 'gender_id', query, values, index);
         [query, values, index] = await generateUpdateQuery(data.timezone, 'timezones', 'study_buddy_timezone_id', query, values, index);
         [query, values, index] = await generateUpdateQuery(data.age, 'age_ranges', 'study_buddy_age_range_id', query, values, index);
-        [query, values, index] = await generateUpdateQuery(data.motivation_level, 'motivation_levels', 'myway_motivation_level_id', query, values, index);
+        [query, values, index] = await generateUpdateQuery(data.motivational_level, 'motivation_levels', 'myway_motivation_level_id', query, values, index);
         [query, values, index] = await generateUpdateQuery(data.language_level, 'language_levels', 'study_buddy_language_level_id', query, values, index);
+        [query, values, index] = await generateUpdateQuery(data.myway_language_level, 'language_levels', 'myway_language_level_id', query, values, index);
         [query, values, index] = await generateUpdateQuery(data.study_time, 'study_times', 'myway_study_time_id', query, values, index);
         [query, values, index] = await generateUpdateQuery(data.native_language, 'languages', 'study_buddy_native_language_id', query, values, index);
         [query, values, index] = await generateUpdateQuery(data.learning_language, 'languages', 'study_buddy_learning_language_id', query, values, index);
@@ -340,12 +349,30 @@ class User {
         let state_id = 0;
         let city_id = 0;
         if (data.country_en && data.country_ja) {
-            [query, values, index, country_id] = await insertCountryStateCity(data.country_en, data.country_ja, 'countries', 'country_id', null, null, query, values, index);
+            [query, values, index, country_id] = await insertCountryStateCity(data.country_en,
+                data.country_ja,
+                'countries',
+                'country_id',
+                null,
+                null,
+                query, values, index);
 
             if (data.state_en && data.state_ja) {
-                [query, values, index, state_id] = await insertCountryStateCity(data.state_en, data.state_ja, 'states', 'state_id', country_id, 'country_id', query, values, index);
+                [query, values, index, state_id] = await insertCountryStateCity(data.state_en,
+                    data.state_ja,
+                    'states',
+                    'state_id',
+                    country_id,
+                    'country_id',
+                    query, values, index);
                 if (data.city_en && data.city_ja) {
-                    [query, values, index, city_id] = await insertCountryStateCity(data.city_en, data.city_ja, 'cities', 'city_id', state_id, 'state_id', query, values, index);
+                    [query, values, index, city_id] = await insertCountryStateCity(data.city_en,
+                        data.city_ja,
+                        'cities',
+                        'city_id',
+                        state_id,
+                        'state_id',
+                        query, values, index);
                 } else {
                     query += `, city_id=$${index}`;
                     index++
@@ -416,7 +443,7 @@ WHERE id = $${index}`, values)
         user.study_buddy_types = studyBuddies.map(a => a.name)
         const goals = await getManyToManyData('goals', 'goals_users', 'user_id', 'goal_id', user.id)
         user.goals = goals.map(a => a.name)
-        console.log(user)
+
         return user;
     }
 
