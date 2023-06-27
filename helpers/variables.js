@@ -1,5 +1,5 @@
 const baseQuery = `SELECT u.username,
-                        u.name
+                        u.name,
                         u.avatar,
                         c.name_en as country_en,
                         c.name_ja as country_ja,
@@ -59,7 +59,7 @@ const privateBaseQuery = `SELECT u.id,
                         COALESCE(l.name,'') AS native_language,
                         COALESCE(l2.name,'') AS learning_language,
                         COALESCE(ll.name,'') AS language_level,
-                        COALESCE(mwll.name,'') AS my_way_language_level,
+                        COALESCE(mwll.name,'') AS myway_language_level,
                         COALESCE(tz.name,'') AS time_zone,
                         COALESCE(a.name,'') AS age_range,
                         u.study_buddy_active,
@@ -74,7 +74,7 @@ const privateBaseQuery = `SELECT u.id,
                         LEFT JOIN languages l on l.id=u.study_buddy_native_language_id
                         LEFT JOIN languages l2 on l2.id=u.study_buddy_learning_language_id
                         LEFT JOIN language_levels ll on ll.id=u.study_buddy_language_level_id
-                        LEFT JOIN language_levels mwll on mwll.id=u.study_buddy_language_level_id
+                        LEFT JOIN language_levels mwll on mwll.id=u.myway_language_level_id
                         LEFT JOIN timezones tz on tz.id=u.study_buddy_timezone_id
                         LEFT JOIN age_ranges a on a.id=u.study_buddy_age_range_id
                         LEFT JOIN premium_accts pa on pa.id=u.premium_acct_id

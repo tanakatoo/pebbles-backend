@@ -292,17 +292,48 @@ class User {
         return result.rows;
     }
 
+    /**
+     * Update premium table if admin
+     * 
+     */
+    static async updatePremium(id, data) {
+        //get premium_id first from user account
+        const get_prem_id = await db.query(
+            `SELECT premium_acct_id
+            FROM users 
+            WHERE id=$1`, [id]
+        )
+        const prem_id = get_prem_id.rows[0].premium_acct_id
+
+        if (!prem_id) throw new NotFoundError
+
+        console.log('got premium id', prem_id)
+        const result = await db.query(
+            `UPDATE premium_accts
+            SET raz_reading_level=$1
+            WHERE id=$2`, [data, prem_id]
+        )
+        console.log('updated results')
+        return "done"
+    }
+
     /**works
         * updates data for the logged in user
         * @returns 201
         */
     static async update(id, data) {
 
+        //update raz-reading level first
+
+
+
         //we have to get the ids of the data we are saving to save to the user table
         //the data passed me must already be the "english" version of the data stored in the db for us to find the id
         //data can be an array
         //use Object.keys(object).find(key => object[key] === value); in the frontend
         //so we replace the info in the incoming data to IDs to be saved and then create a query from that
+
+
         let index = 1;
         let query = '';
         let values = [];
@@ -312,10 +343,10 @@ class User {
          * parameters(data to update, get data from which table, column name in users table, query, values, index)
     
          */
-
+        console.log('timezone', data.time_zone);
         [query, values, index] = await generateUpdateQuery(data.gender, 'genders', 'gender_id', query, values, index);
-        [query, values, index] = await generateUpdateQuery(data.timezone, 'timezones', 'study_buddy_timezone_id', query, values, index);
-        [query, values, index] = await generateUpdateQuery(data.age, 'age_ranges', 'study_buddy_age_range_id', query, values, index);
+        [query, values, index] = await generateUpdateQuery(data.time_zone, 'timezones', 'study_buddy_timezone_id', query, values, index);
+        [query, values, index] = await generateUpdateQuery(data.age_range, 'age_ranges', 'study_buddy_age_range_id', query, values, index);
         [query, values, index] = await generateUpdateQuery(data.motivational_level, 'motivation_levels', 'myway_motivation_level_id', query, values, index);
         [query, values, index] = await generateUpdateQuery(data.language_level, 'language_levels', 'study_buddy_language_level_id', query, values, index);
         [query, values, index] = await generateUpdateQuery(data.myway_language_level, 'language_levels', 'myway_language_level_id', query, values, index);
@@ -327,16 +358,15 @@ class User {
         [query, values, index] = addTextValuesToQuery(data.name, 'name', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.about, 'about', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.myway_habits, 'myway_habits', query, values, index);
+        [query, values, index] = addTextValuesToQuery(data.myway_advice, 'myway_advice', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.study_buddy_bio, 'study_buddy_bio', query, values, index);
-        [query, values, index] = addTextValuesToQuery(data.study_buddy_active, 'study_buddy_active', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.study_buddy_purpose, 'study_buddy_purpose', query, values, index);
 
-        if (data.study_buddy_active && data.study_buddy_active === true) {
-            //also add activate date
-            let date = new Date(Date.now());
-            date = `${date.getUTCFullYear()}/${date.getUTCMonth() + 1}/${date.getUTCDate()}`;
-            [query, values, index] = addTextValuesToQuery(date, 'study_buddy_activate_date', query, values, index);
-        };
+        //add booleans
+
+        query += `, study_buddy_active=$${index}`;
+        values.push(data.study_buddy_active);
+        index++;
 
 
         //if city,country,state are in the data, we have to save that first
@@ -449,7 +479,9 @@ WHERE id = $${index}`, values)
 
 
     static async getPublic(username) {
-
+        console.log(`${baseQuery}
+        WHERE u.username = $1`,
+            [username])
         const userRes = await db.query(
             `${baseQuery}
             WHERE u.username = $1`,
@@ -460,9 +492,9 @@ WHERE id = $${index}`, values)
         if (!user) {
             throw new NotFoundError(`NOT_FOUND`);
         }
-        console.log(user)
-        const studyBuddies = await getManyToManyData('study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id', user.id)
-        user.study_buddy_types = studyBuddies.map(a => a.name)
+        console.log(user);
+        const studyBuddies = await getManyToManyData('study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id', user.id);
+        user.study_buddy_types = studyBuddies.map(a => a.name);
         return user;
     }
 

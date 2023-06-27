@@ -168,8 +168,15 @@ router.patch('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, re
 
         const id = res.locals.user.id
         let user = await User.update(id, req.body)
-        console.log('saving patch data')
-        if (user === 'done') {
+
+        //if user is admin then also update raz kids level in premium table
+        let premium = "done"
+        if (res.locals.user.role === "admin") {
+            // console.log('updating raz reading level', req.body.raz_reading_level)
+            premium = await User.updatePremium(res.locals.user.id, req.body.raz_reading_level)
+        }
+
+        if (user === 'done' && premium === "done") {
             //get all user data
             user = await User.getPrivate(res.locals.user.username)
         }
