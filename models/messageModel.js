@@ -86,7 +86,7 @@ class Message {
              *
              **/
 
-    static async getMessages(username, id) {
+    static async getMessages(username, id, loggedinUsername) {
 
         //get id from username
         const user_id = await getUserID(username)
@@ -97,7 +97,7 @@ class Message {
 
         //get a list of users that the logged in user has messages for and filter out those that the user has blocked
         //this is so users can block more users
-        const messages = await db.query(
+        let messages = await db.query(
             `SELECT uTo.avatar as toAvatar, uFrom.avatar as fromAvatar, 
             uFrom.username as from ,uTo.username as to, 
             m.from_user_id, m.to_user_id, m.msg, m.sent_at, m.read
@@ -110,15 +110,28 @@ class Message {
             ORDER BY sent_at DESC`, [id, user_id]
         )
 
-        console.log(messages.rows)
-
-
         //now we set all of the flags to "read" for the logged in user
         const setRead = await db.query(
             `UPDATE messages SET read=true 
             WHERE (from_user_id=$2 AND to_user_id=$1)`, [id, user_id]
         )
-        console.log(setRead)
+
+        //if we don't find a conversation it means they want to start a conversation, so return the 
+        //username and avatar
+        if (messages.rows.length === 0) {
+            const onlyUser = await db.query(
+                `SELECT avatar as toavatar, username as to, '' as fromavatar, $2 as from
+                FROM users
+                WHERE username=$1`, [username, loggedinUsername]
+            )
+
+            if (onlyUser.rows.length === 0) {
+                throw new NotFoundError
+            } else {
+                messages = onlyUser
+            }
+        }
+        console.log('returning this', messages)
         return messages.rows;
     }
 }

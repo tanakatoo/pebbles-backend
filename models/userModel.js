@@ -250,9 +250,9 @@ class User {
      */
     static async saveUser(user_id, save_id) {
         const result = await db.query(
-            `INSERT INTO saved_users (user_id,saved_id)
-            VALUES ($1,$2)
-            `, [user_id, save_id]
+            `INSERT INTO saved (user_id,saved_id, type)
+            VALUES ($1,$2, $3)
+            `, [user_id, save_id, 'user']
         )
 
         return "success";
@@ -265,7 +265,7 @@ class User {
          */
     static async unsaveUser(user_id, save_id) {
         const result = await db.query(
-            `DELETE FROM saved_users
+            `DELETE FROM saved
             WHERE user_id=$1 AND saved_id=$2
         `, [user_id, save_id]
         )
@@ -278,14 +278,14 @@ class User {
         * Returns list of saved usernames for the logged in user
         * @returns 201
         */
-    static async saved(id) {
+    static async savedUsers(id) {
         const result = await db.query(
-            ` SELECT u.username
-            FROM users u
-            INNER JOIN saved_users su
+            `${baseQuery}
+            INNER JOIN saved su
             ON su.saved_id=u.id
-            WHERE su.user_id==$1
-        `, [id]
+            WHERE su.user_id=$1 
+            AND su.type=$2
+        `, [id, 'user']
         )
 
 

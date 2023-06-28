@@ -18,7 +18,6 @@ const baseQuery = `SELECT u.username,
                         tz.name as time_zone,
                         a.name as age_range,
                         u.study_buddy_active,
-                        u.study_buddy_activate_date,
                         u.free_trial_start_date
                     FROM users u
                     LEFT JOIN countries c on c.id=u.country_id

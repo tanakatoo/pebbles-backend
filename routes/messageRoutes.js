@@ -73,7 +73,7 @@ router.get('/:username', authenticateJWT, isMustBeLoggedIn, async (req, res, nex
     console.log('getting message')
     try {
         const { username } = req.params
-        const result = await Message.getMessages(username, res.locals.user.id)
+        const result = await Message.getMessages(username, res.locals.user.id, res.locals.user.username)
         return res.status(200).json(result)
 
     } catch (e) {

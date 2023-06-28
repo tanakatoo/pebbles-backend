@@ -43,8 +43,9 @@ VALUES ('Beginner'),('Intermediate'),('Advanced');
 
 INSERT INTO users(username, password,email,role,sign_up_date,last_login_date,language_preference, gender_id) /*password is asdfasdf*/
 VALUES ('ktoo','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanaka@gmail.com','admin','2023-05-01','2023-05-01',1,1),
- ('hello','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaa@gmail.com','admin','2023-05-01','2023-05-01',1,1),
- ('blockMe','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaaa@gmail.com','regular','2023-05-01','2023-05-01',1,1);
+ ('hello','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaa@gmail.com','regular','2023-05-01','2023-05-01',1,1),
+ ('blockMe','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaaa@gmail.com','regular','2023-05-01','2023-05-01',1,1),
+  ('newUser','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaaaa@gmail.com','regular','2023-05-01','2023-05-01',1,1);
 
 INSERT INTO messages (from_user_id,to_user_id,msg, sent_at, read) 
 VALUES (1,2,'first message', '2023-06-07 15:30:00+00:00', true), 
@@ -56,8 +57,8 @@ VALUES (1,2,'first message', '2023-06-07 15:30:00+00:00', true),
 INSERT INTO blocked_users (user_id,blocked_user_id)
 VALUES (1,3), (2,3);
 
-INSERT INTO saved_users (user_id,saved_id)
-VALUES (1,2);
+INSERT INTO saved (user_id,saved_id, type)
+VALUES (1,2, 'user');
 
 -- subquery to get all messages from users that are not blocked
 select * from messages where to_user_id != (select blocked_user_id from blocked_users where user_id = 2) and 

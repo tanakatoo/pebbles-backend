@@ -140,12 +140,12 @@ router.delete('/unsave/:username', authenticateJWT, isMustBeLoggedIn, async (req
  * For logged in users display all favourited users
  * returns 200 if succcess, unauthorized if not logged in, notfound if user to favourite is not found
  */
-router.get('/saved', authenticateJWT, isMustBeLoggedIn, async (req, res, next) => {
+router.get('/saved-users', authenticateJWT, isMustBeLoggedIn, async (req, res, next) => {
 
     try {
 
         const id = res.locals.user.id
-        const result = await User.saved(id)
+        const result = await User.savedUsers(id)
         return res.status(200).json(result)
 
     } catch (e) {
@@ -160,7 +160,7 @@ router.get('/saved', authenticateJWT, isMustBeLoggedIn, async (req, res, next) =
  * 
  */
 router.patch('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, res, next) => {
-    console.log('in patching data, body is', req.body)
+
     try {
         if (req.correctUser == false) {
             throw new UnauthorizedError
@@ -172,7 +172,7 @@ router.patch('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, re
         //if user is admin then also update raz kids level in premium table
         let premium = "done"
         if (res.locals.user.role === "admin") {
-            // console.log('updating raz reading level', req.body.raz_reading_level)
+
             premium = await User.updatePremium(res.locals.user.id, req.body.raz_reading_level)
         }
 
@@ -180,7 +180,7 @@ router.patch('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, re
             //get all user data
             user = await User.getPrivate(res.locals.user.username)
         }
-        console.log(user)
+
         return res.status(200).json(user)
 
     } catch (e) {
@@ -199,9 +199,9 @@ router.get('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, res,
         const loggedIn = req.loggedIn
         const isCorrectUser = req.correctUser
         const username = req.params.username
-        console.log(loggedIn, isCorrectUser, username)
+
         if (loggedIn && isCorrectUser) {
-            console.log('getting private becauwe i am admin', username)
+            console.log('not correct, why?', loggedIn, isCorrectUser)
             userData = await User.getPrivate(username)
             userData.myProfile = true
         } else {

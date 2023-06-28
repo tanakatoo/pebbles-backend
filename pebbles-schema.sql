@@ -149,8 +149,9 @@ CREATE TABLE blocked_users(
     PRIMARY KEY (blocked_user_id, user_id)
 );
 
-CREATE TABLE saved_users(
+CREATE TABLE saved(
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     saved_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type VARCHAR(50) NOT NULL,
     PRIMARY KEY (user_id, saved_id)
 );
