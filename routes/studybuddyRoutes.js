@@ -37,14 +37,13 @@ router.get('/search', authenticateJWT, async (req, res, next) => {
 router.get('/:page', async (req, res, next) => {
 
     try {
-        let { page } = req.params
+        let { page } = req.params;
 
-        const result = await Studybuddy.getList(page)
-        return res.status(200).json({ list: result })
+        const result = await Studybuddy.getList(page);
+        return res.status(200).json(result);
 
     } catch (e) {
-        console.log('in blocked user routes,', e)
-        return next(e)
+        return next(e);
     }
 })
 

@@ -1,4 +1,5 @@
-const baseQuery = `SELECT u.username,
+const baseQuery = `SELECT u.id,
+                        u.username,
                         u.name,
                         u.avatar,
                         c.name_en as country_en,
@@ -18,7 +19,8 @@ const baseQuery = `SELECT u.username,
                         tz.name as time_zone,
                         a.name as age_range,
                         u.study_buddy_active,
-                        u.free_trial_start_date
+                        u.free_trial_start_date,
+                        u.study_buddy_activate_date
                     FROM users u
                     LEFT JOIN countries c on c.id=u.country_id
                     LEFT JOIN cities on cities.id=u.city_id
@@ -63,7 +65,8 @@ const privateBaseQuery = `SELECT u.id,
                         COALESCE(a.name,'') AS age_range,
                         u.study_buddy_active,
                         COALESCE(u.study_buddy_purpose,'') AS study_buddy_purpose,
-                        u.free_trial_start_date
+                        u.free_trial_start_date,
+                        u.study_buddy_activate_date
                         FROM users u
                         LEFT JOIN countries c on c.id=u.country_id
                         LEFT JOIN cities on cities.id=u.city_id

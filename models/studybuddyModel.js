@@ -5,6 +5,7 @@ const User = require("./userModel")
 const { getUserID } = require('../helpers/getUserID')
 const { blockedUser } = require('../helpers/blockedUser')
 const { baseQuery } = require('../helpers/variables')
+const { getManyToManyData } = require("../helpers/getManyToManyData")
 
 const {
     NotFoundError,
@@ -16,8 +17,6 @@ const {
 
 class Studybuddy {
 
-
-
     /**
      * gets list of study buddies that are active ordered by activate date, 30 at a time
      * @param (page) page indicates page number 
@@ -25,26 +24,40 @@ class Studybuddy {
      */
 
     static async getList(page) {
-        const numToDisplayPerPage = 2
-        const baseQuery = `${baseQuery} 
+
+        const numToDisplayPerPage = 2;
+        const buddyBaseQuery = `${baseQuery} 
             WHERE u.study_buddy_active = true
             ORDER BY study_buddy_activate_date DESC
-            LIMIT ${numToDisplayPerPage}`
+            LIMIT ${numToDisplayPerPage}`;
 
-        let query = ''
-        let offset = 0
+        let query = '';
+        let offset = 0;
         if (page > 1) {
             offset = (page - 1) * numToDisplayPerPage
             query = `OFFSET $1`
-        }
+        };
 
         const userRes = await db.query(
-            baseQuery + query, page > 1 ? [offset] : []
+            buddyBaseQuery + query, page > 1 ? [offset] : []
         );
 
-        const user = userRes.rows;
+        const users = userRes.rows;
 
-        return user;
+        //for each user, get the study buddy type and add it to the return variable
+        let returnStudyBuddies = await Promise.all(users.map(async (i) => {
+            console.log(i)
+            let studyTypes = await getManyToManyData('study_buddy_types',
+                'study_buddy_types_users',
+                'user_id',
+                'study_buddy_type_id',
+                i.id);
+            i.study_buddy_types = studyTypes.map(a => a.name);
+            return i;
+
+        }));
+
+        return users;
     }
 
     /**works

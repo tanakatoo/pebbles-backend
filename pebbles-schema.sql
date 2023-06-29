@@ -108,7 +108,8 @@ CREATE TABLE users(
     study_buddy_language_level_id INTEGER REFERENCES language_levels(id) ON DELETE SET NULL,
     study_buddy_timezone_id INTEGER REFERENCES timezones(id) ON DELETE SET NULL,
     study_buddy_age_range_id INTEGER REFERENCES age_ranges(id) ON DELETE SET NULL,
-    study_buddy_active BOOLEAN NOT NULL DEFAULT false
+    study_buddy_active BOOLEAN NOT NULL DEFAULT false,
+    study_buddy_activate_date DATE
 );
 
 CREATE TABLE study_buddy_types_users(

@@ -13,11 +13,12 @@ const { baseQuery, privateBaseQuery } = require('../helpers/variables')
 const { generateUpdateQuery,
     addTextValuesToQuery,
     updateManyToMany,
-    insertCountryStateCity,
-    addIDsToQuery } = require('../helpers/generateUpdateQuery')
+    insertCountryStateCity
+} = require('../helpers/generateUpdateQuery')
 const { getManyToManyData } = require('../helpers/getManyToManyData')
-class User {
 
+
+class User {
 
     /** WORKS 
      * Get all users that the logged in user has messaged without the blocked users
@@ -305,15 +306,16 @@ class User {
         )
         const prem_id = get_prem_id.rows[0].premium_acct_id
 
-        if (!prem_id) throw new NotFoundError
+        if (prem_id) {
 
-        console.log('got premium id', prem_id)
-        const result = await db.query(
-            `UPDATE premium_accts
+
+            const result = await db.query(
+                `UPDATE premium_accts
             SET raz_reading_level=$1
             WHERE id=$2`, [data, prem_id]
-        )
-        console.log('updated results')
+            )
+            console.log('updated results')
+        }
         return "done"
     }
 
@@ -323,16 +325,11 @@ class User {
         */
     static async update(id, data) {
 
-        //update raz-reading level first
-
-
-
         //we have to get the ids of the data we are saving to save to the user table
         //the data passed me must already be the "english" version of the data stored in the db for us to find the id
         //data can be an array
         //use Object.keys(object).find(key => object[key] === value); in the frontend
         //so we replace the info in the incoming data to IDs to be saved and then create a query from that
-
 
         let index = 1;
         let query = '';
@@ -355,6 +352,7 @@ class User {
         [query, values, index] = await generateUpdateQuery(data.learning_language, 'languages', 'study_buddy_learning_language_id', query, values, index);
 
         //add other text into query
+        console.log('this is bio', data.study_buddy_bio);
         [query, values, index] = addTextValuesToQuery(data.name, 'name', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.about, 'about', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.myway_habits, 'myway_habits', query, values, index);
@@ -367,6 +365,15 @@ class User {
         query += `, study_buddy_active=$${index}`;
         values.push(data.study_buddy_active);
         index++;
+
+        //if study buddy is active, we have to set the activate date to today
+        const currentDate = new Date().toJSON().slice(0, 10);
+        console.log(currentDate)
+        if (data.study_buddy_active) {
+            query += `, study_buddy_activate_date=$${index}`;
+            values.push(currentDate);
+            index++;
+        }
 
 
         //if city,country,state are in the data, we have to save that first
@@ -434,15 +441,14 @@ class User {
         console.log('this is the query', `UPDATE users 
 SET ${query} 
 WHERE id = $${index}`, values)
-        const resultsUsers = db.query(
+        const resultsUsers = await db.query(
             `UPDATE users 
             SET ${query} 
             WHERE id = $${index}`, values
         );
-
-        await updateManyToMany(data.goals, id, 'goals', 'goals_users', 'user_id', 'goal_id')
-        await updateManyToMany(data.study_buddy_types, id, 'study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id')
-
+        console.log('result of updating query', resultsUsers);
+        await updateManyToMany(data.goals, id, 'goals', 'goals_users', 'user_id', 'goal_id');
+        await updateManyToMany(data.study_buddy_types, id, 'study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id');
 
         return 'done'
     }
