@@ -6,6 +6,7 @@ const { getUserID } = require('../helpers/getUserID')
 const { blockedUser } = require('../helpers/blockedUser')
 const { baseQuery } = require('../helpers/variables')
 const { getManyToManyData } = require("../helpers/getManyToManyData")
+const { arrayWhereClause } = require('../helpers/filterSQL')
 
 const {
     NotFoundError,
@@ -13,6 +14,7 @@ const {
     UnauthorizedError,
     ExpressError
 } = require("../error");
+const { types } = require("pg");
 
 
 class Studybuddy {
@@ -62,39 +64,83 @@ class Studybuddy {
 
     /**works
         * gets list of study buddies that are active ordered by activate date, 30 at a time
+        * filtered by criteria
         * @param (page) page indicates page number 
         * @returns [{study buddy properties}] 
         */
 
-    static async searchList(page, word, language_level, gender, timezone, age) {
+    static async searchList(page, word, language_level, gender, timezone, age, type, native_lang, learning_lang) {
         const numToDisplayPerPage = 3
 
-        let filters = ''
-        filters += word ? ` AND (u.study_buddy_bio ILIKE '${word}' OR u.username ILIKE '${word}') ` : ''
-        filters += language_level ? ` AND (ll.name = '${language_level}' ) ` : ''
-        filters += gender ? ` AND (genders.name = '${gender}' ) ` : ''
-        filters += timezone ? ` AND (tz.name = '${timezone}' ) ` : ''
-        filters += age ? ` AND (a.name = '${age}' ) ` : ''
+        // console.log('building search', language_level, gender, timezone, age, type, native_lang, learning_lang)
+        let index = 1;
+        let values = [];
 
-        let myBaseQuery = `${baseQuery} 
-                            WHERE u.study_buddy_active = true
-                            ${filters} 
-                            LIMIT ${numToDisplayPerPage}`
+        let filters = ' WHERE u.study_buddy_active = $1';
+        index++
+        values.push(true);
 
-        let query = ''
-        let offset = 0
-        if (page > 1) {
-            offset = (page - 1) * numToDisplayPerPage
-            query = `OFFSET $1`
+        if (word) {
+            filters += word ? ` AND (u.study_buddy_bio ILIKE $2 OR u.username ILIKE $2) ` : ''
+            values.push(word);
+            index++;
         }
-        console.log('base and query is', query)
-        console.log(myBaseQuery + query)
-        const userRes = await db.query(
-            myBaseQuery + query, page > 1 ? [offset] : []
-        );
 
+
+        //these are all arrays which we need to concatenate
+        [filters, index, values] = arrayWhereClause(native_lang, 'l.name', filters, index, values);
+        [filters, index, values] = arrayWhereClause(learning_lang, 'l2.name', filters, index, values);
+        [filters, index, values] = arrayWhereClause(language_level, 'll.name', filters, index, values);
+        [filters, index, values] = arrayWhereClause(gender, 'genders.name', filters, index, values);
+        [filters, index, values] = arrayWhereClause(timezone, 'tz.name', filters, index, values);
+        [filters, index, values] = arrayWhereClause(age, 'a.name', filters, index, values);
+
+        let offsetQuery = ''
+        if (page > 1) {
+
+            let offset = (page - 1) * numToDisplayPerPage
+            offsetQuery = ` OFFSET $${index}`
+            index++
+            values.push(offset)
+        }
+
+        let userRes
+        //add the study buddy filter
+        if (type.length > 0) {
+            let params = []
+            for (let i = 0; i <= type.length; i++) {
+                params.push('$' + index);
+                index++
+                values.push(type[i])
+            }
+            console.log(`${baseQuery}
+INNER JOIN study_buddy_types_users sbu ON sbu.user_id = u.id
+INNER JOIN study_buddy_types sb ON sb.id = sbu.study_buddy_type_id
+${filters} AND sb.name in (${params.join(',')}) 
+LIMIT ${numToDisplayPerPage} ${offsetQuery}`, values)
+            userRes = await db.query(
+                `${baseQuery}
+                INNER JOIN study_buddy_types_users sbu ON sbu.user_id = u.id
+                INNER JOIN study_buddy_types sb ON sb.id = sbu.study_buddy_type_id
+                ${filters} AND sb.name in (${params.join(',')}) 
+                LIMIT ${numToDisplayPerPage} ${offsetQuery}`, values
+            )
+            console.log(userRes.rows)
+
+        } else {
+
+            userRes = await db.query(
+                baseQuery + filters + offsetQuery, values
+            );
+        }
         const user = userRes.rows;
         console.log(user)
+
+        // hvae to add on page offset later
+        // const userRes = await db.query(
+        //     myBaseQuery + query, page > 1 ? [offset] : []
+        // );
+
         return user;
     }
 

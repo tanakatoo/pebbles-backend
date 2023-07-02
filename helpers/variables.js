@@ -1,4 +1,4 @@
-const baseQuery = `SELECT u.id,
+const baseQuery = `SELECT DISTINCT (u.id),
                         u.username,
                         u.name,
                         u.avatar,

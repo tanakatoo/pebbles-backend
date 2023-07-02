@@ -166,6 +166,7 @@ router.patch('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, re
             throw new UnauthorizedError
         }
         console.log('this is what i get', req.body)
+
         const id = res.locals.user.id
         let user = await User.update(id, req.body)
 

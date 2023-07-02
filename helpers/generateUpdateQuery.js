@@ -4,7 +4,9 @@ const pg = require('pg')
 
 async function generateUpdateQuery(data, fromTableName, columnName, query, values, index) {
 
+
     if (data) {
+        console.log('updating time zone because data is empty')
         const id = await db.query(
             `SELECT id 
                 FROM ${fromTableName}
@@ -14,13 +16,15 @@ async function generateUpdateQuery(data, fromTableName, columnName, query, value
             throw new NotFoundError;
         };
 
-        query += index === 1 ? '' : ',';
-        query += ` ${columnName}= $${index}`;
-        index = index + 1;
         values.push(id.rows[0].id);
 
-    };
+    } else if (data === '') {
 
+        values.push(null);
+    }
+    query += index === 1 ? '' : ',';
+    query += ` ${columnName}= $${index}`;
+    index = index + 1;
     return [query, values, index];
 }
 
@@ -28,10 +32,13 @@ async function generateUpdateQuery(data, fromTableName, columnName, query, value
 
 function addTextValuesToQuery(data, columnName, query, values, index) {
     if (data) {
-        query += `, ${columnName}=$${index}`;
         values.push(data);
-        index++;
     }
+    else if (data === '') {
+        values.push(null);
+    }
+    query += `, ${columnName}=$${index}`;
+    index++;
     return [query, values, index];
 }
 

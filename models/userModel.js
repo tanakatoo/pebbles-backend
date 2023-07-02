@@ -330,7 +330,7 @@ class User {
         //data can be an array
         //use Object.keys(object).find(key => object[key] === value); in the frontend
         //so we replace the info in the incoming data to IDs to be saved and then create a query from that
-
+        console.log('this is what we are updating', data)
         let index = 1;
         let query = '';
         let values = [];
@@ -446,7 +446,7 @@ WHERE id = $${index}`, values)
             SET ${query} 
             WHERE id = $${index}`, values
         );
-        console.log('result of updating query', resultsUsers);
+        console.log('result of updating query', resultsUsers.rows);
         await updateManyToMany(data.goals, id, 'goals', 'goals_users', 'user_id', 'goal_id');
         await updateManyToMany(data.study_buddy_types, id, 'study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id');
 
