@@ -14,9 +14,9 @@ const Studybuddy = require('../models/studybuddyModel')
  */
 router.get('/search', authenticateJWT, async (req, res, next) => {
     try {
-        console.log('this is what we got from query')
+
         const { page, word, language_level, gender, timezone, age, type, native_lang, learning_lang } = req.query
-        console.log(page, word, language_level, gender, timezone, age, type, native_lang, learning_lang)
+
 
 
         const result = await Studybuddy.searchList(page, word, language_level, gender, timezone, age, type, native_lang, learning_lang)

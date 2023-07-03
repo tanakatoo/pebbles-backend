@@ -6,18 +6,23 @@ function arrayWhereClause(arr, criteriaName, filters, index, values) {
                 filters += ` AND (`
             }
 
-            else if ((idx !== arr.length - 1 && arr[idx + 1])) {
+            if ((idx !== arr.length - 1 && arr[idx + 1])) {
                 //if this is not the last one
-                filters += `${criteriaName} = $${index} OR `
+                filters += ` ${criteriaName} = $${index} OR `
                 values.push(l)
                 index++
 
-            } else if (idx === arr.length - 1) {
+            } else {
+                filters += ` ${criteriaName} = $${index} `
+                values.push(l)
+                index++
+            }
+
+            if (idx === arr.length - 1) {
 
                 //this is the last one
-                filters += ` ${criteriaName} = $${index} ) `
-                values.push(l)
-                index++
+                filters += ` ) `
+
             }
 
         })
