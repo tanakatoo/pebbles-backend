@@ -11,9 +11,12 @@ function generateToken(id, username) {
 }
 
 function generateForgotPasswordToken(id) {
+    console.log('generating token', id)
     let payload = {
         id: id
     }
+    const x = jwt.sign(payload, SECRET_KEY, { expiresIn: '15m' })
+    console.log('id is', jwt.verify(x, SECRET_KEY))
     return jwt.sign(payload, SECRET_KEY, { expiresIn: '15m' })
 }
 

@@ -1,7 +1,28 @@
 {
     "REGISTERED":{
-        "EN":"You are registered",
-        "JA":"Jap you are registered"
+        "EN":{
+            "SUBJECT":"Registration with Pebbles Community",
+            "WELCOME":"Welcome",
+            "TEXT1":"Thank you for signing up to Pebbles Community! We are glad you are joining us. ",
+            "TEXT2":"Our community is waiting for you to explore, find new connections and learn new things.",
+            "TEXT3":"We are here to support your life in Japan and learning Japanese so check out all 4 areas of the community!",
+            "TEXT3_LINK_TEXT_TITLE":"Learn about our community",
+            "TEXT3_LINK":"about#top",
+            "QUESTION":"If you have any questions or comments, feel free to reply to this email.",
+            "SIGNOFF":"See you around!"
+        },
+        "JA":{
+            "SUBJECT":"Pebbles Communityを登録ずみ",
+            "WELCOME":"いらっしゃい",
+            "TEXT1":"日本語Thank you for signing up to Pebbles Community! We are glad you are joining us. ",
+            "TEXT2":"日本語Our community is waiting for you to explore, find new connections and learn new things.",
+            "TEXT3":"日本語We are here to support your life in Japan and learning Japanese so check out all 4 areas of the community!",
+            "TEXT3_LINK_TEXT_TITLE":"日本語Learn about our community",
+            "TEXT3_LINK":"about#top",
+            "QUESTION":"質問やコメントがありましたら、ご気楽にこのメールをそのまま返信してください。",
+            "SIGNOFF":"コミュニティーで会いましょうね！"
+        }
+       
     },
     "PASSWORD_RESET":{
         "EN":{
@@ -13,9 +34,10 @@
             "SUBJECT":"Jap Password reset",
             "BODY": "Jap Here is your password reset link. Click on it and it will take you to reset your password",
             "BUTTON":"Jap Reset"
-            
         }
-       
-        
+    },
+    "CONTACT_US":{
+        "EN":"From contact us",
+        "JA":"コンタクトページ"
     }
 }

@@ -168,6 +168,7 @@ class User {
             throw new BadRequestError("USERNAME_TAKEN");
         }
 
+        console.log('password is', password)
         const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
         const result = await db.query(
@@ -176,7 +177,7 @@ class User {
             password,
             email)
            VALUES ($1, $2, $3)
-           RETURNING id, username,role`,
+           RETURNING id, username,role, email`,
             [
                 username,
                 hashedPassword,
@@ -210,8 +211,7 @@ class User {
         const user = result.rows[0];
 
         if (user) {
-            console.log('in user model', user)
-            console.log(password, user.password)
+
             // compare hashed password to a new hash from password
             const isValid = await bcrypt.compare(password, user.password);
             if (isValid === true) {
@@ -233,7 +233,7 @@ class User {
         const query = username ? 'username' : 'email'
         const queryData = username ? username : email
         const result = await db.query(
-            `SELECT username,email
+            `SELECT username,email,id
                FROM users
                WHERE ${query} = $1`,
             [queryData],
@@ -330,7 +330,7 @@ class User {
         //data can be an array
         //use Object.keys(object).find(key => object[key] === value); in the frontend
         //so we replace the info in the incoming data to IDs to be saved and then create a query from that
-        console.log('this is what we are updating', data)
+
         let index = 1;
         let query = '';
         let values = [];
@@ -340,7 +340,7 @@ class User {
          * parameters(data to update, get data from which table, column name in users table, query, values, index)
     
          */
-        console.log('timezone', data.time_zone);
+
         [query, values, index] = await generateUpdateQuery(data.gender, 'genders', 'gender_id', query, values, index);
         [query, values, index] = await generateUpdateQuery(data.time_zone, 'timezones', 'study_buddy_timezone_id', query, values, index);
         [query, values, index] = await generateUpdateQuery(data.age_range, 'age_ranges', 'study_buddy_age_range_id', query, values, index);
@@ -352,7 +352,7 @@ class User {
         [query, values, index] = await generateUpdateQuery(data.learning_language, 'languages', 'study_buddy_learning_language_id', query, values, index);
 
         //add other text into query
-        console.log('this is bio', data.study_buddy_bio);
+
         [query, values, index] = addTextValuesToQuery(data.name, 'name', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.about, 'about', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.myway_habits, 'myway_habits', query, values, index);
@@ -438,9 +438,7 @@ class User {
          */
 
         //update users table this works
-        console.log('this is the query', `UPDATE users 
-SET ${query} 
-WHERE id = $${index}`, values)
+
         const resultsUsers = await db.query(
             `UPDATE users 
             SET ${query} 
@@ -510,16 +508,18 @@ WHERE id = $${index}`, values)
      * @returns id, username and role
      */
 
-    static async setPassword(username = null, email = null, password) {
+    static async setPassword(id, password) {
+
         const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
         // try to find the user
-        const query = username ? 'username' : 'email'
-        const queryData = username ? username : email
+        // const query = username ? 'username' : 'email'
+        // const queryData = username ? username : email
+
         const result = await db.query(
-            `UPDATE users SET password = ${hashedPassword}
-            WHERE ${query} = $1
+            `UPDATE users SET password = '${hashedPassword}'
+            WHERE id = $1
             RETURNING id, username, role`,
-            [queryData],
+            [id],
         );
 
         const user = result.rows[0];

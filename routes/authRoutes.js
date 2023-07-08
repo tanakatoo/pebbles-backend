@@ -5,12 +5,16 @@ const jsonschema = require('jsonschema')
 const router = express.Router();
 const userRegisterSchema = require("../schemas/userRegister.json")
 const userLoginSchema = require("../schemas/userLogin.json")
-const passwordSchema = require("../schemas/password.json")
+const changePasswordSchema = require("../schemas/changePassword.json")
+const setPasswordSchema = require("../schemas/setPassword.json")
+
 const { BadRequestError } = require("../error")
 const User = require("../models/userModel")
 const { generateToken, generateForgotPasswordToken } = require("../helpers/token")
 const validatorPkg = require("validator")
-const sendEmail = require("../helpers/emailing")
+const { sendForgotPassword, sendRegister } = require("../helpers/emailing")
+const jwt = require("jsonwebtoken");
+const { SECRET_KEY } = require("../config");
 
 
 router.post('/login', async (req, res, next) => {
@@ -43,11 +47,11 @@ router.post('/login', async (req, res, next) => {
 });
 
 
-router.post('/password', async (req, res, next) => {
+router.post('/change-password', async (req, res, next) => {
     try {
         //validate data
 
-        const validator = jsonschema.validate(req.body, passwordSchema)
+        const validator = jsonschema.validate(req.body, changePasswordSchema)
         if (!validator.valid) {
 
             const errs = validator.errors.map(e => e.stack)
@@ -62,16 +66,16 @@ router.post('/password', async (req, res, next) => {
             user = await User.findUser(username, null)
         }
         if (user) {
+
             const token = generateForgotPasswordToken(user.id)
 
             //if user is found, send email here
             //to, name, type, lang,link = ''
-            sendEmail('reach.pebbles@gmail.com',
-                username,
+            sendForgotPassword(user.email,
+                user.username,
                 "PASSWORD_RESET",
                 lang,
-                `${process.env.DOMAIN_URL}/reset-password?token=${token}`,
-                "Password reset"
+                `${process.env.DOMAIN_URL}/reset-password?token=${token}`
             )
             console.log('user is found so sending email')
 
@@ -89,24 +93,31 @@ router.post('/password', async (req, res, next) => {
 router.post('/set-password', async (req, res, next) => {
     try {
         //validate data
-        const validator = jsonschema.validate(req.body, passwordSchema)
+        const validator = jsonschema.validate(req.body, setPasswordSchema)
         if (!validator.valid) {
 
             const errs = validator.errors.map(e => e.stack)
             throw new BadRequestError(errs)
         }
-        const { username, password } = req.body
-        //see if identifier is an email
-        let user
-        if (validatorPkg.isEmail(username)) {
-            user = await User.setPassword(null, username, password)
-        } else {
-            user = await User.setPassword(username, null, password)
-        }
+        const { password, lang, token } = req.body
+        //check that we can get id from token
+        const id = jwt.verify(token, SECRET_KEY).id
+        console.log('got id from token', id)
 
+        //set password in db
+        console.log('estting password,', id, password)
+        const passwordSetUser = await User.setPassword(id, password)
+
+        console.log('user is', passwordSetUser)
+        if (passwordSetUser) {
+            //return token
+            const token = generateToken(passwordSetUser.id, passwordSetUser.username, passwordSetUser.role)
+            const user = await User.getPrivate(passwordSetUser.username)
+            return res.status(201).json({ token, user })
+        }
         //return token
-        const token = generateToken(user.id, user.username, user.role)
-        return res.status(201).json(token)
+
+        throw new BadRequestError("password could not be set")
     } catch (e) {
         return next(e)
     }
@@ -115,6 +126,8 @@ router.post('/set-password', async (req, res, next) => {
 router.post('/register', async (req, res, next) => {
     try {
         //validate data
+        const { username, password, email, lang } = req.body
+
         const validator = jsonschema.validate(req.body, userRegisterSchema)
         if (!validator.valid) {
 
@@ -125,7 +138,18 @@ router.post('/register', async (req, res, next) => {
         const newUser = await User.register({ ...req.body })
         const token = generateToken(newUser.id, newUser.username, newUser.role)
         console.log('registered', newUser, token)
-        console.log()
+        //if user is registered, send email here
+        //to, name, type, lang,link = ''
+
+        console.log('going to register')
+        if (newUser) {
+            sendRegister(newUser.email,
+                newUser.username,
+                "REGISTERED",
+                lang
+            )
+        }
+
         return res.status(201).json(token)
     } catch (e) {
         return next(e)

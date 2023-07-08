@@ -48,7 +48,7 @@ class Studybuddy {
 
         //for each user, get the study buddy type and add it to the return variable
         let returnStudyBuddies = await Promise.all(users.map(async (i) => {
-            console.log(i)
+
             let studyTypes = await getManyToManyData('study_buddy_types',
                 'study_buddy_types_users',
                 'user_id',
@@ -72,9 +72,7 @@ class Studybuddy {
     static async searchList(page, word, language_level, gender, timezone, age, type, native_lang, learning_lang) {
         const numToDisplayPerPage = 3;
 
-        console.log('building search', 'word', word, 'page', page,
-            'langauge level', language_level, 'gender', gender, 'timezone', timezone,
-            'age', age, 'type', type, 'native-lang', native_lang, 'learning lang', learning_lang);
+
         let index = 1;
         let values = [];
 
@@ -115,11 +113,7 @@ class Studybuddy {
                 index++
                 values.push(type[i])
             };
-            console.log(`${baseQuery};
-INNER JOIN study_buddy_types_users sbu ON sbu.user_id = u.id
-INNER JOIN study_buddy_types sb ON sb.id = sbu.study_buddy_type_id
-${filters} AND sb.name in (${params.join(',')}) 
-LIMIT ${numToDisplayPerPage} ${offsetQuery}`, values);
+
             userRes = await db.query(
                 `${baseQuery}
                 INNER JOIN study_buddy_types_users sbu ON sbu.user_id = u.id
@@ -127,10 +121,10 @@ LIMIT ${numToDisplayPerPage} ${offsetQuery}`, values);
                 ${filters} AND sb.name in (${params.join(',')}) 
                 LIMIT ${numToDisplayPerPage} ${offsetQuery}`, values
             );
-            console.log(userRes.rows);
+
 
         } else {
-            console.log('query without others', baseQuery + filters + offsetQuery, values)
+
             userRes = await db.query(
                 baseQuery + filters + offsetQuery, values
             );
@@ -142,15 +136,11 @@ LIMIT ${numToDisplayPerPage} ${offsetQuery}`, values);
         let usersWithType = [];
         if (user.length > 0) {
             usersWithType = await Promise.all(user.map(async u => {
-                console.log('user to get many is', u);
                 const res = await getManyToManyData('study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id', u.id);
-                console.log('got yptes', res);
                 u.study_buddy_types = res.map(r => r.name);
-                console.log('after setting types, user is', u);
             }));
         }
 
-        console.log('this is user', usersWithType);
 
         // hvae to add on page offset later
         // const userRes = await db.query(

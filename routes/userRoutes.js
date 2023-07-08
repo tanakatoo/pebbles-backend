@@ -165,7 +165,7 @@ router.patch('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, re
         if (req.correctUser == false) {
             throw new UnauthorizedError
         }
-        console.log('this is what i get', req.body)
+
 
         const id = res.locals.user.id
         let user = await User.update(id, req.body)
@@ -177,7 +177,7 @@ router.patch('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, re
             premium = await User.updatePremium(res.locals.user.id, req.body.raz_reading_level)
         }
 
-        console.log('done updating?', user)
+
         if (user === 'done' && premium === "done") {
             //get all user data
             user = await User.getPrivate(res.locals.user.username)
