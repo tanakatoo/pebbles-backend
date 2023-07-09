@@ -190,6 +190,22 @@ router.patch('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, re
     }
 })
 
+
+router.get('/search', async (req, res, next) => {
+
+    try {
+        // const { word } = req.params
+        console.log('gotparams', req.query)
+        const results = await User.getSearchUsers(req.query.word)
+        console.log('got results', results)
+        return res.status(200).json(results)
+
+    } catch (e) {
+        return next(e)
+    }
+})
+
+
 /** WORKS
  * For user to access profiles
  * if they are logged in and it is their own profile they are getting, then get all the information

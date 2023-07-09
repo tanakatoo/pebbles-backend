@@ -20,6 +20,30 @@ const { getManyToManyData } = require('../helpers/getManyToManyData')
 
 class User {
 
+
+    /**WORKS  
+     * Get all users that match the search word
+     *
+     * Returns [id] on success
+     *
+     **/
+
+    static async getSearchUsers(word) {
+        console.log('in odels', word)
+        //get a list of users that the logged in user has messages for and filter out those that the user has blocked
+        //this is so users scan block more users
+        const users = await db.query(
+            `SELECT u.username, u.avatar, u.name, u.about, u.premium_acct_id,
+            p.end_date
+            FROM users u
+            LEFT JOIN premium_accts p ON p.id=u.premium_acct_id
+            WHERE username ilike $1 OR
+            u.name ilike $1 OR
+            u.about ilike $1`, [`%${word}%`])
+        return users.rows;
+    }
+
+
     /** WORKS 
      * Get all users that the logged in user has messaged without the blocked users
      * (used for blocking additional users)
