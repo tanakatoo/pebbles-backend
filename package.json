@@ -19,6 +19,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "jest": "^29.6.1",
     "jsonschema": "^1.4.1",
     "jsonwebtoken": "^9.0.0",
     "passport": "^0.6.0",
@@ -28,5 +29,8 @@
     "uuid": "^9.0.0",
     "validator": "^13.9.0",
     "zeptomail": "^3.0.4"
+  },
+  "devDependencies": {
+    "supertest": "^6.3.3"
   }
 }
