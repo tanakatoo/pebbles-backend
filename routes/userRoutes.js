@@ -1,6 +1,6 @@
 const express = require('express')
 const router = new express.Router()
-const { authenticateJWT, isCorrectUserOrAdmin, isMustBeLoggedIn } = require("../middleware/auth")
+const { authenticateJWT, isCorrectUser, isMustBeLoggedIn } = require("../middleware/auth")
 const User = require('../models/userModel')
 const { getUserID } = require('../helpers/getUserID')
 const { UnauthorizedError } = require('../error')
@@ -159,7 +159,7 @@ router.get('/saved-users', authenticateJWT, isMustBeLoggedIn, async (req, res, n
  * For user to edit their profiles
  * 
  */
-router.patch('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, res, next) => {
+router.patch('/:username', authenticateJWT, isCorrectUser, async (req, res, next) => {
 
     try {
         if (req.correctUser == false) {
@@ -211,15 +211,15 @@ router.get('/search', async (req, res, next) => {
  * if they are logged in and it is their own profile they are getting, then get all the information
  * otherwise get only the public information
  */
-router.get('/:username', authenticateJWT, isCorrectUserOrAdmin, async (req, res, next) => {
+router.get('/:username', authenticateJWT, isCorrectUser, async (req, res, next) => {
 
     try {
         const loggedIn = req.loggedIn
-        const isCorrectUser = req.correctUser
+        const correctUser = req.correctUser
         const username = req.params.username
-
-        if (loggedIn && isCorrectUser) {
-            console.log('not correct, why?', loggedIn, isCorrectUser)
+        console.log('is it the correct user?', correctUser)
+        if (loggedIn && correctUser) {
+            console.log('not correct, why?', loggedIn, correctUser)
             userData = await User.getPrivate(username)
             userData.myProfile = true
         } else {

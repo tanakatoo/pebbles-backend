@@ -14,8 +14,7 @@ const googleOauthRedirect = process.env.GOOGLE_OAUTH_REDIRECT_URL
 
 // Use dev database, testing database, or via env var, production database
 function getDatabaseUri() {
-    console.log('env is now', process.env.NODE_ENV)
-    console.log('db uri from process env is', process.env.DATABASE_URL)
+
 
     return (process.env.NODE_ENV === "test")
         ? "postgresql:///pebbles_test"

@@ -99,14 +99,36 @@ function ensureAdmin(req, res, next) {
  does not throw error if not admin or correct user
  */
 
-function isCorrectUserOrAdmin(req, res, next) {
+function isCorrectUser(req, res, next) {
     try {
         const user = res.locals.user;
-        if (!(user && (user.role === "admin" || user.username === req.params.username))) {
+        if (!(user && (user.username === req.params.username))) {
             req.correctUser = false
 
         } else {
             req.correctUser = true
+        }
+        return next();
+    } catch (err) {
+        return next(err);
+    }
+}
+
+
+/** Middleware to check if they are admin
+ *  username provided as route param.
+ *Adds to the request object whether the logged in user is the correct user to view resource
+ does not throw error if not admin or correct user
+ */
+
+function isAdmin(req, res, next) {
+    try {
+        const user = res.locals.user;
+        if (!(user && (user.role === "admin"))) {
+            req.adminUser = true
+
+        } else {
+            req.adminUser = false
         }
         return next();
     } catch (err) {
@@ -145,6 +167,6 @@ module.exports = {
     authenticateJWT,
     isMustBeLoggedIn,
     ensureAdmin,
-    isCorrectUserOrAdmin,
+    isCorrectUser,
     // isMustBeCorrectUserOrAdmin
 };

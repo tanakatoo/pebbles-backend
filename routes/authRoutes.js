@@ -89,7 +89,7 @@ router.post('/change-password', async (req, res, next) => {
     }
 });
 
-
+//
 router.post('/set-password', async (req, res, next) => {
     try {
         //validate data
@@ -108,7 +108,7 @@ router.post('/set-password', async (req, res, next) => {
         console.log('estting password,', id, password)
         const passwordSetUser = await User.setPassword(id, password)
 
-        console.log('user is', passwordSetUser)
+        console.log('user is', passwordSetUser === true)
         if (passwordSetUser) {
             //return token
             const token = generateToken(passwordSetUser.id, passwordSetUser.username, passwordSetUser.role)
@@ -123,6 +123,8 @@ router.post('/set-password', async (req, res, next) => {
     }
 });
 
+
+//done test
 router.post('/register', async (req, res, next) => {
     try {
         //validate data
@@ -137,11 +139,7 @@ router.post('/register', async (req, res, next) => {
 
         const newUser = await User.register({ ...req.body })
         const token = generateToken(newUser.id, newUser.username, newUser.role)
-        console.log('registered', newUser, token)
-        //if user is registered, send email here
-        //to, name, type, lang,link = ''
 
-        console.log('going to register')
         if (newUser) {
             sendRegister(newUser.email,
                 newUser.username,

@@ -538,14 +538,16 @@ class User {
         // try to find the user
         // const query = username ? 'username' : 'email'
         // const queryData = username ? username : email
-
+        console.log('workfactor', BCRYPT_WORK_FACTOR)
+        console.log('hashed pwd', hashedPassword)
+        console.log('id is', id)
         const result = await db.query(
             `UPDATE users SET password = '${hashedPassword}'
             WHERE id = $1
             RETURNING id, username, role`,
             [id],
         );
-
+        console.log(result)
         const user = result.rows[0];
         return user;
     }

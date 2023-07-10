@@ -1,6 +1,6 @@
 const express = require('express')
 const router = new express.Router()
-const { authenticateJWT, isCorrectUserOrAdmin, isMustBeLoggedIn } = require("../middleware/auth")
+const { authenticateJWT, isCorrectUser, isMustBeLoggedIn } = require("../middleware/auth")
 const User = require('../models/userModel')
 const { sendToUs } = require('../helpers/emailing')
 const { UnauthorizedError } = require('../error')
