@@ -16,3 +16,4 @@ CREATE DATABASE pebbles_test;
 \connect pebbles_test
 
 \i pebbles-schema.sql
+\i pebbles-seed-test.sql

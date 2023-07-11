@@ -21,15 +21,6 @@ app.use('/messages', messageRoutes)
 app.use('/study-buddies', studybuddyRoutes)
 app.use('/email', emailRoutes)
 
-// sendEmail()
-
-//to test connection to email server
-// async function run() {
-//     const response = await mailchimpTx.users.ping();
-//     console.log(response);
-// }
-
-// run();
 
 app.get('./favicon.ico', (req, res) => {
     res.sendStatus(204)

@@ -6,7 +6,7 @@ async function generateUpdateQuery(data, fromTableName, columnName, query, value
 
 
     if (data) {
-        console.log('updating time zone because data is empty')
+
         const id = await db.query(
             `SELECT id 
                 FROM ${fromTableName}

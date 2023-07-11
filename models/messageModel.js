@@ -22,8 +22,9 @@ class Message {
     */
     static async sendMsg(id, username, msg) {
 
+
         const user_id = await getUserID(username)
-        console.log('in msg model', id, username, msg)
+        console.log('in msg model to user id', user_id, id, username, msg)
         //did user block me
         //returns false, but it throws error if logged user is blocked
         const userBlockedMe = await blockedUser(id, user_id, id)

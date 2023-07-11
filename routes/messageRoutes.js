@@ -2,8 +2,10 @@ const express = require('express')
 const router = new express.Router()
 const { authenticateJWT, isMustBeLoggedIn } = require("../middleware/auth")
 const Message = require('../models/messageModel')
+const { BadRequestError } = require('../error')
 
 
+//testing done
 /**WORKS
  * For logged in user to send message to another user 
  * parameters ( msg)
@@ -15,6 +17,9 @@ router.post('/:username/send', authenticateJWT, isMustBeLoggedIn, async (req, re
     try {
 
         const { msg } = req.body
+        if (typeof (msg) !== 'string') {
+            throw new BadRequestError("not a valid type")
+        }
         const { username } = req.params
         console.log('in msg route', msg, username, res.locals.user.id)
         const result = await Message.sendMsg(res.locals.user.id, username, msg)
@@ -27,7 +32,7 @@ router.post('/:username/send', authenticateJWT, isMustBeLoggedIn, async (req, re
 })
 
 
-
+//testing done
 /**works
  * For logged in user to get the latest messages from all their connections
  * 
@@ -46,7 +51,9 @@ router.get('/', authenticateJWT, isMustBeLoggedIn, async (req, res, next) => {
     }
 })
 
-/**to implement
+
+//not part of frontend yet, so not tested
+/**works
  * For logged in user to search in their contacts
  * 
  * returns [{from_user_id, to_user_id,msg,sent_at,read}]
@@ -64,6 +71,8 @@ router.get('/search', authenticateJWT, isMustBeLoggedIn, async (req, res, next) 
     }
 })
 
+
+//testing done
 /**works
  * For logged in user to get all the messages for one user
  * 

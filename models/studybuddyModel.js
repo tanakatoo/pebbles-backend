@@ -72,7 +72,6 @@ class Studybuddy {
     static async searchList(page, word, language_level, gender, timezone, age, type, native_lang, learning_lang) {
         const numToDisplayPerPage = 3;
 
-
         let index = 1;
         let values = [];
 
@@ -122,7 +121,6 @@ class Studybuddy {
                 LIMIT ${numToDisplayPerPage} ${offsetQuery}`, values
             );
 
-
         } else {
 
             userRes = await db.query(
@@ -132,9 +130,9 @@ class Studybuddy {
 
         const user = userRes.rows;
         //get study buddy types as array and return
-        console.log('how many did i get?', user.length);
         let usersWithType = [];
         if (user.length > 0) {
+            console.log('in types')
             usersWithType = await Promise.all(user.map(async u => {
                 const res = await getManyToManyData('study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id', u.id);
                 u.study_buddy_types = res.map(r => r.name);

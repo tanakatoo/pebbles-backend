@@ -154,10 +154,11 @@ class User {
         //get a list of users that the logged in user has blocked
         //this is so users can unblock users
         const unblockUser = await db.query(
-            `DELETE FROM blocked_users WHERE user_id=$1 and blocked_user_id=$2`, [id, user_id]
+            `DELETE FROM blocked_users WHERE user_id=$1 and blocked_user_id=$2 
+            returning user_id`, [id, user_id]
         )
 
-        return unblockUser;
+        return unblockUser.rows[0];
     }
 
     /** Register user with username, email, password
@@ -378,6 +379,7 @@ class User {
         //add other text into query
 
         [query, values, index] = addTextValuesToQuery(data.name, 'name', query, values, index);
+        [query, values, index] = addTextValuesToQuery(data.email, 'email', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.about, 'about', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.myway_habits, 'myway_habits', query, values, index);
         [query, values, index] = addTextValuesToQuery(data.myway_advice, 'myway_advice', query, values, index);
@@ -462,13 +464,16 @@ class User {
          */
 
         //update users table this works
+        console.log('this is updating ', `UPDATE users 
+SET ${query} 
+WHERE id = $${index}`, values)
 
         const resultsUsers = await db.query(
             `UPDATE users 
             SET ${query} 
             WHERE id = $${index}`, values
         );
-        console.log('result of updating query', resultsUsers.rows);
+
         await updateManyToMany(data.goals, id, 'goals', 'goals_users', 'user_id', 'goal_id');
         await updateManyToMany(data.study_buddy_types, id, 'study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id');
 
@@ -491,7 +496,7 @@ class User {
             WHERE u.username = $1`,
             [username],
         );
-        console.log('username is', username)
+
         const user = userRes.rows[0];
 
         if (!user) throw new NotFoundError('NOT_FOUND');
@@ -520,7 +525,7 @@ class User {
         if (!user) {
             throw new NotFoundError(`NOT_FOUND`);
         }
-        console.log(user);
+
         const studyBuddies = await getManyToManyData('study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id', user.id);
         user.study_buddy_types = studyBuddies.map(a => a.name);
         return user;
@@ -538,16 +543,14 @@ class User {
         // try to find the user
         // const query = username ? 'username' : 'email'
         // const queryData = username ? username : email
-        console.log('workfactor', BCRYPT_WORK_FACTOR)
-        console.log('hashed pwd', hashedPassword)
-        console.log('id is', id)
+
         const result = await db.query(
             `UPDATE users SET password = '${hashedPassword}'
             WHERE id = $1
             RETURNING id, username, role`,
             [id],
         );
-        console.log(result)
+
         const user = result.rows[0];
         return user;
     }

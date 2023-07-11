@@ -16,7 +16,7 @@ const { sendForgotPassword, sendRegister } = require("../helpers/emailing")
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 
-
+//done testing 
 router.post('/login', async (req, res, next) => {
     try {
         //validate data
@@ -46,7 +46,7 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
-
+//done testing
 router.post('/change-password', async (req, res, next) => {
     try {
         //validate data
@@ -89,7 +89,7 @@ router.post('/change-password', async (req, res, next) => {
     }
 });
 
-//
+//done testing
 router.post('/set-password', async (req, res, next) => {
     try {
         //validate data

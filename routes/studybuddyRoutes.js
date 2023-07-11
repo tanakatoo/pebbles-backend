@@ -4,8 +4,8 @@ const { authenticateJWT, isMustBeLoggedIn, isMustBeCorrectUserOrAdmin } = requir
 const Studybuddy = require('../models/studybuddyModel')
 
 
-
-/**implementing
+//testing ok
+/**works
  * filters study buddies according to the filter criteria, in no specific order, 30 at a time
  * no authentication required
  * 
@@ -16,9 +16,7 @@ router.get('/search', authenticateJWT, async (req, res, next) => {
     try {
 
         const { page, word, language_level, gender, timezone, age, type, native_lang, learning_lang } = req.query
-
-
-
+        console.log('we got lanlevel', language_level)
         const result = await Studybuddy.searchList(page, word, language_level, gender, timezone, age, type, native_lang, learning_lang)
         return res.status(200).json(result)
 
@@ -29,6 +27,7 @@ router.get('/search', authenticateJWT, async (req, res, next) => {
 })
 
 
+//testing done
 /** works
  * gets list of study buddies that are active ordered by activate date, 30 at a time
  * no authentication required

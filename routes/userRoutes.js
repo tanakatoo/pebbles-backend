@@ -6,6 +6,7 @@ const { getUserID } = require('../helpers/getUserID')
 const { UnauthorizedError } = require('../error')
 
 
+//testing complete
 /** WORKS
  * For logged in user to unblock a user
  * parameters (id, unblock_id)
@@ -18,6 +19,7 @@ router.delete('/unblock/:username', authenticateJWT, isMustBeLoggedIn, async (re
         const { username } = req.params
         const id = res.locals.user.id
         const result = await User.unblockUser(id, username)
+
         return res.status(204).json(result)
 
     } catch (e) {
@@ -26,7 +28,7 @@ router.delete('/unblock/:username', authenticateJWT, isMustBeLoggedIn, async (re
 })
 
 
-
+//testing complete
 /** WORKS
  * For logged in user to block a user
  * parameters (id)
@@ -41,7 +43,7 @@ router.post('/block/:username', authenticateJWT, isMustBeLoggedIn, async (req, r
 
         const id = res.locals.user.id
         const result = await User.blockUser(username, id)
-        return res.status(204).json(result)
+        return res.status(201).json(result)
 
     } catch (e) {
         console.log('in blocked user routes,', e)
@@ -49,6 +51,8 @@ router.post('/block/:username', authenticateJWT, isMustBeLoggedIn, async (req, r
     }
 })
 
+
+//testing done
 /** WORKS
  * For logged in user to display the blocked users
  * parameters (id)
@@ -68,6 +72,8 @@ router.get('/blocked', authenticateJWT, isMustBeLoggedIn, async (req, res, next)
     }
 })
 
+
+//testing complete
 /** 
  * Get a list of users that the logged in user is contacting - without blocked users
  * parameters (id)
@@ -88,6 +94,7 @@ router.get('/contacts', authenticateJWT, isMustBeLoggedIn, async (req, res, next
 })
 
 
+//testing complete
 /** works
  * For logged in users to favourite another user
  * returns 201 if succcess, unauthorized if not logged in, notfound if user to favourite is not found
@@ -99,20 +106,18 @@ router.post('/save/:username', authenticateJWT, isMustBeLoggedIn, async (req, re
         const { username } = req.params
         const user_id = await getUserID(username)
 
-
         const id = res.locals.user.id
-        console.log(user_id, id)
         const result = await User.saveUser(id, user_id)
         return res.status(201).json(result)
 
     } catch (e) {
-        console.log('in save user routes,', e)
+
         return next(e)
     }
 })
 
 
-
+//testing done
 /** works
  * For logged in users to unfavourite another user
  * returns 204 if succcess, unauthorized if not logged in, notfound if user to favourite is not found
@@ -136,8 +141,10 @@ router.delete('/unsave/:username', authenticateJWT, isMustBeLoggedIn, async (req
     }
 })
 
+
+//testing done
 /** works
- * For logged in users display all favourited users
+ * For logged in users display all saved users
  * returns 200 if succcess, unauthorized if not logged in, notfound if user to favourite is not found
  */
 router.get('/saved-users', authenticateJWT, isMustBeLoggedIn, async (req, res, next) => {
@@ -153,6 +160,7 @@ router.get('/saved-users', authenticateJWT, isMustBeLoggedIn, async (req, res, n
         return next(e)
     }
 })
+
 
 
 /** works

@@ -129,36 +129,3 @@ function sendToUs(data) {
 
 module.exports = { sendForgotPassword, sendToUs, sendRegister }
 
-
-
-// const mailchimp = require("@mailchimp/mailchimp_transactional")(process.env.MAILCHIMP_API_KEY)
-
-// function sendEmail(msg) {
-//     const message = {
-//         from_email: "info@pebblescommunity.com",
-//         subject: "Hello world",
-//         text: "Welcome to Mailchimp Transactional!",
-//         to: [
-//             {
-//                 email: "karmen.tanaka@gmail.com",
-//                 type: "to"
-//             }
-//         ]
-//     };
-
-//     async function run() {
-//         try {
-//             const response = await mailchimp.messages.send({
-//                 message
-//             });
-//             console.log(response);
-//             return "success"
-//         } catch (e) {
-//             return e
-//         }
-//     }
-//     run();
-// }
-
-// module.exports = sendEmail
-
