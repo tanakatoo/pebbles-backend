@@ -1,1 +1,0 @@
-//checks to see if a state is already in the db, if not then add it

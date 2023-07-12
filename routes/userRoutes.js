@@ -162,7 +162,7 @@ router.get('/saved-users', authenticateJWT, isMustBeLoggedIn, async (req, res, n
 })
 
 
-
+//testing done
 /** works
  * For user to edit their profiles
  * 
@@ -174,7 +174,7 @@ router.patch('/:username', authenticateJWT, isCorrectUser, async (req, res, next
             throw new UnauthorizedError
         }
 
-
+        console.log('info coming into routes ', req.body)
         const id = res.locals.user.id
         let user = await User.update(id, req.body)
 
@@ -199,13 +199,17 @@ router.patch('/:username', authenticateJWT, isCorrectUser, async (req, res, next
 })
 
 
+//testing complete
+/**WORKS
+ * Gets list of users that has the search term in their username, name or about
+ * 
+ */
 router.get('/search', async (req, res, next) => {
-
+    console.log('got word, ', req.query.word, req.body)
     try {
-        // const { word } = req.params
-        console.log('gotparams', req.query)
+
         const results = await User.getSearchUsers(req.query.word)
-        console.log('got results', results)
+
         return res.status(200).json(results)
 
     } catch (e) {
@@ -213,7 +217,7 @@ router.get('/search', async (req, res, next) => {
     }
 })
 
-
+//testing done
 /** WORKS
  * For user to access profiles
  * if they are logged in and it is their own profile they are getting, then get all the information

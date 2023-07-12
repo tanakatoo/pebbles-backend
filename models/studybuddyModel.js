@@ -19,7 +19,7 @@ const { types } = require("pg");
 
 class Studybuddy {
 
-    /**
+    /**testing done
      * gets list of study buddies that are active ordered by activate date, 30 at a time
      * @param (page) page indicates page number 
      * @returns [{study buddy properties}] 
@@ -27,7 +27,7 @@ class Studybuddy {
 
     static async getList(page) {
 
-        const numToDisplayPerPage = 2;
+        const numToDisplayPerPage = 30;
         const buddyBaseQuery = `${baseQuery} 
             WHERE u.study_buddy_active = true
             ORDER BY study_buddy_activate_date DESC
@@ -62,7 +62,8 @@ class Studybuddy {
         return users;
     }
 
-    /**works
+    /**testing done
+     * works
         * gets list of study buddies that are active ordered by activate date, 30 at a time
         * filtered by criteria
         * @param (page) page indicates page number 
@@ -70,7 +71,7 @@ class Studybuddy {
         */
 
     static async searchList(page, word, language_level, gender, timezone, age, type, native_lang, learning_lang) {
-        const numToDisplayPerPage = 3;
+        const numToDisplayPerPage = 30;
 
         let index = 1;
         let values = [];
@@ -80,7 +81,10 @@ class Studybuddy {
         values.push(true);
 
         if (word) {
-            filters += word ? ` AND (u.study_buddy_bio ILIKE $2 OR u.username ILIKE $2 OR u.study_buddy_purpose ILIKE $2) ` : ''
+            filters += word ? ` AND (u.study_buddy_bio ILIKE $2 OR 
+                u.username ILIKE $2 OR
+                u.study_buddy_purpose ILIKE $2 OR
+                u.name ILIKE $2) ` : ''
             values.push(`%${word}%`);
             index++;;
         };
@@ -127,7 +131,7 @@ class Studybuddy {
                 baseQuery + filters + offsetQuery, values
             );
         };
-
+        console.log('query is', baseQuery + filters + offsetQuery, values)
         const user = userRes.rows;
         //get study buddy types as array and return
         let usersWithType = [];
@@ -139,11 +143,6 @@ class Studybuddy {
             }));
         }
 
-
-        // hvae to add on page offset later
-        // const userRes = await db.query(
-        //     myBaseQuery + query, page > 1 ? [offset] : []
-        // );
 
         return user;
     }

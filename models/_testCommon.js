@@ -1,15 +1,9 @@
-"use strict";
+const bcrypt = require("bcrypt");
 
 const db = require("../db.js");
-const User = require("../models/userModel");
-
-const Message = require("../models/messageModel");
-
-const StudyBuddy = require("../models/studybuddyModel");
-
-const { generateToken } = require("../helpers/token");
-
-
+const { BCRYPT_WORK_FACTOR } = require("../config");
+const { generateToken } = require('../helpers/token.js')
+const testJobIds = [];
 
 async function commonBeforeAll() {
 
@@ -19,41 +13,20 @@ async function commonBeforeAll() {
     await db.query("DELETE FROM states");
     await db.query("DELETE FROM messages");
 
-    await User.register(
-        {
-            username: "testuser1",
-            password: "asdfasdf",
-            email: 'testuser1@test.com'
-        });
-
-    await User.register(
-        {
-            username: "testuser2",
-            password: "asdfasdf",
-            email: 'testuser2@test.com'
-        });
-
-    await User.register(
-        {
-            username: "testuser3",
-            password: "asdfasdf",
-            email: 'testuser3@test.com'
-        });
-
-    await User.register(
-        {
-            username: "admin",
-            password: "asdfasdf",
-            email: 'admin@test.com'
-        });
-
-    await db.query(`UPDATE users SET role='admin' where username='admin'`)
+    await db.query(`
+  INSERT INTO users(username, password,email,role,sign_up_date,last_login_date,language_preference, gender_id) 
+VALUES ('testuser1','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','testuser1@test.com','regular','2023-05-01','2023-05-01',1,1),
+ ('testuser2','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','testuser2@test.com','regular','2023-05-01','2023-05-01',1,1),
+ ('testuser3','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','testuser3@test.com','regular','2023-05-01','2023-05-01',1,1),
+  ('admin','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','admin@test.com','admin','2023-05-01','2023-05-01',1,1);
+`);
 
     await getTokens()
     await setLocation()
 
-
 }
+
+
 async function getTokens() {
     //get the ids for the 3 mock users
     const allIDs = await db.query('select id from users')
@@ -66,6 +39,7 @@ async function getTokens() {
     process.env.u2Id = allIDs.rows[1].id
     process.env.u3Id = allIDs.rows[2].id
     process.env.admin = allIDs.rows[3].id
+
 }
 
 async function setLocation() {
@@ -92,14 +66,10 @@ async function commonAfterAll() {
 }
 
 
-
-
-
 module.exports = {
     commonBeforeAll,
     commonBeforeEach,
     commonAfterEach,
     commonAfterAll,
-    getTokens,
-    setLocation
+    testJobIds,
 };

@@ -21,7 +21,7 @@ const { getManyToManyData } = require('../helpers/getManyToManyData')
 class User {
 
 
-    /**WORKS  
+    /**WORKS  testing done
      * Get all users that match the search word
      *
      * Returns [id] on success
@@ -29,7 +29,7 @@ class User {
      **/
 
     static async getSearchUsers(word) {
-        console.log('in odels', word)
+
         //get a list of users that the logged in user has messages for and filter out those that the user has blocked
         //this is so users scan block more users
         const users = await db.query(
@@ -44,7 +44,7 @@ class User {
     }
 
 
-    /** WORKS 
+    /** WORKS , tested
      * Get all users that the logged in user has messaged without the blocked users
      * (used for blocking additional users)
      * Returns [id, username, avatar] of contacts on success
@@ -84,7 +84,7 @@ class User {
         return listOfUsers.rows;
     }
 
-    /**WORKS 
+    /**WORKS tested
      * Get user role every time we need to authorize them in case their role is changed in the backend
      * return user id, role
      */
@@ -102,7 +102,7 @@ class User {
         return result.rows[0]
     }
 
-    /**WORKS  
+    /**WORKS  tested
      * Get all users that the user has blocked
      *
      * Returns [id] on success
@@ -122,7 +122,7 @@ class User {
     }
 
 
-    /**WORKS  
+    /**WORKS  tested
      * Block a user
      *
      * Returns id, username of blocked user on success
@@ -344,6 +344,7 @@ class User {
         return "done"
     }
 
+
     /**works
         * updates data for the logged in user
         * @returns 201
@@ -464,9 +465,7 @@ class User {
          */
 
         //update users table this works
-        console.log('this is updating ', `UPDATE users 
-SET ${query} 
-WHERE id = $${index}`, values)
+
 
         const resultsUsers = await db.query(
             `UPDATE users 

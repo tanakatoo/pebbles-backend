@@ -19,18 +19,18 @@ afterAll(commonAfterAll);
 /************************************** POST /messages/:username/send */
 
 describe("POST /messages/:username/send", function () {
-    // test("successfully sends a message to another user", async function () {
-    //     const resp = await request(app)
-    //         .post(`/messages/testuser2/send`)
-    //         .send({
-    //             msg: "user 1 to user 2",
-    //         })
-    //         .set("authorization", `Bearer ${process.env.u1Token}`);
-    //     console.log('response is', resp.body)
-    //     expect(resp.body.from_user_id).toEqual(+process.env.u1Id);
-    //     expect(resp.body.to_user_id).toEqual(+process.env.u2Id);
-    //     expect(resp.body.msg).toEqual('user 1 to user 2');
-    // });
+    test("successfully sends a message to another user", async function () {
+        const resp = await request(app)
+            .post(`/messages/testuser2/send`)
+            .send({
+                msg: "user 1 to user 2",
+            })
+            .set("authorization", `Bearer ${process.env.u1Token}`);
+        console.log('response is', resp.body)
+        expect(resp.body.from_user_id).toEqual(+process.env.u1Id);
+        expect(resp.body.to_user_id).toEqual(+process.env.u2Id);
+        expect(resp.body.msg).toEqual('user 1 to user 2');
+    });
 
     test("cannot send to a user who blocked you", async function () {
 

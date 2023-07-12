@@ -22,7 +22,7 @@ router.get('/location', async (req, res, next) => {
         }
 
         const { q, lang, sessionToken } = req.query
-        console.log('sessiontoken for locaton query', sessionToken)
+
         const result = await client.placeAutocomplete({
             params: {
                 input: q,

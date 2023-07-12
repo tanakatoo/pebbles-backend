@@ -15,13 +15,12 @@ const {
 
 class Message {
 
-    /** 
+    /** testing done
     * Check that the user has not blocked the logged in user, if so return "unauthorized"
     * Check that the logged in user has not blocked the user to send messages to, if so, return BadRequestError
     * else return "success"
     */
     static async sendMsg(id, username, msg) {
-
 
         const user_id = await getUserID(username)
         console.log('in msg model to user id', user_id, id, username, msg)
@@ -42,7 +41,8 @@ class Message {
     }
 
 
-    /** Get all users that the logged in user has messaged and the latest message without the blocked users
+    /**testing complete 
+     * Get all users that the logged in user has messaged and the latest message without the blocked users
          *
          * Returns [from_user_name,to_user_name, msg, sent_at] on success ordered by unread first
          *
@@ -81,20 +81,22 @@ class Message {
         return latestMessageList.rows;
     }
 
-    /** Get conversation for logged in user and anothe ruser
-             *
-             * Returns [from_user_name,to_user_name, msg, sent_at] on success ordered by latest date
-             *
-             **/
 
+
+    /**  testing done
+     * Get conversation for logged in user and another user
+    *
+    * Returns [from_user_name,to_user_name, msg, sent_at] on success ordered by latest date
+    *
+    **/
     static async getMessages(username, id, loggedinUsername) {
 
         //get id from username
         const user_id = await getUserID(username)
 
-        //check if I blocked user
-        //should not throw error as there is no ui to display messages of blocked user
-        const iBlockedUser = await blockedUser(user_id, id, user_id)
+        // //check if I blocked user
+        // //should not throw error as there is no ui to display messages of blocked user
+        // const iBlockedUser = await blockedUser(user_id, id, user_id)
 
         //get a list of users that the logged in user has messages for and filter out those that the user has blocked
         //this is so users can block more users
@@ -118,7 +120,7 @@ class Message {
         )
 
         //if we don't find a conversation it means they want to start a conversation, so return the 
-        //username and avatar
+        //username and avatar but in the same format as returning a message
         if (messages.rows.length === 0) {
             const onlyUser = await db.query(
                 `SELECT avatar as toavatar, username as to, '' as fromavatar, $2 as from
@@ -132,7 +134,7 @@ class Message {
                 messages = onlyUser
             }
         }
-        console.log('returning this', messages)
+
         return messages.rows;
     }
 }
