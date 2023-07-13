@@ -140,7 +140,7 @@ class User {
         return result.rows[0];
     }
 
-    /**WORKS  
+    /**WORKS  testing done
      * Unblock a user
          *
          * Returns [id] on success
@@ -161,6 +161,7 @@ class User {
         return unblockUser.rows[0];
     }
 
+    //testing done
     /** Register user with username, email, password
      *
      * Returns { id, role } on success and BadRequestError on duplicates
@@ -215,6 +216,7 @@ class User {
         return user;
     }
 
+    //testing done
     /** login user with username or email, password.
      *
      * Returns { id, username, name, email, is_admin }
@@ -233,6 +235,10 @@ class User {
             [queryData],
         );
 
+        console.log(`SELECT username, role, password, id 
+        FROM users
+           WHERE ${query} = $1`,
+            [queryData])
         const user = result.rows[0];
 
         if (user) {
@@ -248,7 +254,7 @@ class User {
         throw new UnauthorizedError('INVALID_CREDENTIALS');
     }
 
-    /**
+    /** testing done
      * See if a username or email exists for changing password
      * @returns user
      */
@@ -270,7 +276,7 @@ class User {
     }
 
 
-    /**
+    /** testing done
      * To favourite a user
      * @returns 201
      */
@@ -285,7 +291,7 @@ class User {
     }
 
 
-    /**
+    /** testing done
          * To unfavourite a user
          * @returns 204
          */
@@ -300,7 +306,7 @@ class User {
         return "success";
     }
 
-    /**
+    /** testing done
         * Returns list of saved usernames for the logged in user
         * @returns 201
         */
@@ -318,6 +324,7 @@ class User {
         return result.rows;
     }
 
+    //test later, not yet implemented
     /**
      * Update premium table if admin
      * 
@@ -344,7 +351,7 @@ class User {
         return "done"
     }
 
-
+    //testing complete
     /**works
         * updates data for the logged in user
         * @returns 201
@@ -470,9 +477,13 @@ class User {
         const resultsUsers = await db.query(
             `UPDATE users 
             SET ${query} 
-            WHERE id = $${index}`, values
+            WHERE id = $${index} returning id`, values
         );
 
+        if (resultsUsers.rows.length === 0) {
+            //this means there is an error in the query 
+            return new BadRequestError()
+        }
         await updateManyToMany(data.goals, id, 'goals', 'goals_users', 'user_id', 'goal_id');
         await updateManyToMany(data.study_buddy_types, id, 'study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id');
 
@@ -511,9 +522,7 @@ class User {
 
 
     static async getPublic(username) {
-        console.log(`${baseQuery}
-        WHERE u.username = $1`,
-            [username])
+
         const userRes = await db.query(
             `${baseQuery}
             WHERE u.username = $1`,
@@ -531,7 +540,7 @@ class User {
     }
 
     /**
-     * Accepts username or email and password and updates the user record with the  password
+     * Accepts user id and password and updates the user record with the  password
      * 
      * @returns id, username and role
      */
