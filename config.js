@@ -14,6 +14,7 @@ const BCRYPT_WORK_FACTOR = 12
 
 // Use dev database, testing database, or via env var, production database
 function getDatabaseUri() {
+
     return (process.env.NODE_ENV === "test")
         ? "postgresql:///pebbles_test"
         : `postgresql:///${process.env.DATABASE_URL}` || "postgresql:///pebbles";

@@ -147,8 +147,11 @@ router.post('/register', async (req, res, next) => {
                 lang
             )
         }
+        //log them in, so we get their information 
+        const userInfo = await User.getPrivate(username)
+        userInfo.myProfile = true
 
-        return res.status(201).json(token)
+        return res.status(201).json({ token: token, user: userInfo })
     } catch (e) {
         return next(e)
     }
