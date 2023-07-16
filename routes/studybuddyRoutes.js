@@ -40,6 +40,7 @@ router.get('/:page', async (req, res, next) => {
         let { page } = req.params;
 
         const result = await Studybuddy.getList(page);
+        console.log('result is', result)
         return res.status(200).json(result);
 
     } catch (e) {
