@@ -17,7 +17,7 @@ function getDatabaseUri() {
 
     return (process.env.NODE_ENV === "test")
         ? "postgresql:///pebbles_test"
-        : `postgresql:///${process.env.DATABASE_URL}` || "postgresql:///pebbles";
+        : `${process.env.DATABASE_URL}` || "postgresql:///pebbles";
 }
 
 console.log("Database:", getDatabaseUri());

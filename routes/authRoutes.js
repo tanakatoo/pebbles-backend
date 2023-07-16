@@ -8,7 +8,7 @@ const userLoginSchema = require("../schemas/userLogin.json")
 const changePasswordSchema = require("../schemas/changePassword.json")
 const setPasswordSchema = require("../schemas/setPassword.json")
 
-const { BadRequestError } = require("../error")
+const { BadRequestError, NotFoundError } = require("../error")
 const User = require("../models/userModel")
 const { generateToken, generateForgotPasswordToken } = require("../helpers/token")
 const validatorPkg = require("validator")
@@ -78,9 +78,11 @@ router.post('/change-password', async (req, res, next) => {
                 `${process.env.DOMAIN_URL}/reset-password?token=${token}`
             )
             console.log('user is found so sending email')
-
+            return res.status(201).json('completed')
+        } else {
+            throw new NotFoundError("NOT_FOUND")
         }
-        return res.status(201).json('completed')
+
 
 
 
