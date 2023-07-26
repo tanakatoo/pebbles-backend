@@ -37,7 +37,7 @@ router.get('/location', async (req, res, next) => {
 
         //some locations do not have types, so we have to check if there are "types" associated with the location
         result.data.predictions.map(d => {
-            if (d.types && (d.types.find(ele => ele == 'locality' || ele == 'country' || ele == 'administrative_area_level_1')))
+            if (d.types && (d.types.find(ele => ele === 'locality' || ele === 'country' || ele === 'administrative_area_level_1')))
                 resultToReturn.push({ description: d.description, place_id: d.place_id })
         })
 
@@ -87,27 +87,27 @@ router.get('/select-location', async (req, res, next) => {
         let state_ja
         let country_ja
         resultEN.data.result.address_components.map(l => {
-            if (l.types.find(ele => ele == 'locality')) {
+            if (l.types.find(ele => ele === 'locality')) {
                 //if locality is the type then
                 console.log(l.long_name)
                 city = l.long_name
-            } else if (l.types.find(ele => ele == 'administrative_area_level_1')) {
+            } else if (l.types.find(ele => ele === 'administrative_area_level_1')) {
                 console.log(l.long_name)
                 state = l.long_name
-            } else if (l.types.find(ele => ele == 'country')) {
+            } else if (l.types.find(ele => ele === 'country')) {
                 console.log(l.long_name)
                 country = l.long_name
             }
         })
         resultJA.data.result.address_components.map(l => {
-            if (l.types.find(ele => ele == 'locality')) {
+            if (l.types.find(ele => ele === 'locality')) {
                 //if locality is the type then
                 console.log(l.long_name)
                 city_ja = l.long_name
-            } else if (l.types.find(ele => ele == 'administrative_area_level_1')) {
+            } else if (l.types.find(ele => ele === 'administrative_area_level_1')) {
                 console.log(l.long_name)
                 state_ja = l.long_name
-            } else if (l.types.find(ele => ele == 'country')) {
+            } else if (l.types.find(ele => ele === 'country')) {
                 console.log(l.long_name)
                 country_ja = l.long_name
             }

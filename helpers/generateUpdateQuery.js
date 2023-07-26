@@ -134,7 +134,7 @@ async function insertCountryStateCity(dataEN, dataJA, tableName, userCol, id = n
         );
     };
 
-    query += index == 1 ? '' : ',';
+    query += index === 1 ? '' : ',';
     query += ` ${userCol}= $${index}`;
     index++;
 

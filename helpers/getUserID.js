@@ -6,7 +6,7 @@ async function getUserID(username) {
     //get user id of the user to send message to
     const userResult = await db.query(`SELECT id FROM users WHERE username=$1`, [username])
 
-    if (userResult.rows.length == 0) {
+    if (userResult.rows.length === 0) {
         throw new NotFoundError
     }
 
