@@ -74,7 +74,7 @@ async function updateManyToMany(data, id, tableName, manyTableName, col1, col2) 
             );
             console.log(ids.rows[0])
             return ids.rows[0].id;
-        }));
+        })).catch((error) => console.log("error", error));
 
         //for each id in tableName, did the user select it?
 

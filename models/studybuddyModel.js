@@ -26,7 +26,7 @@ class Studybuddy {
      */
 
     static async getList(page) {
-
+        console.log('going to get study buddies i model ')
         const numToDisplayPerPage = 30;
         const buddyBaseQuery = `${baseQuery} 
             WHERE u.study_buddy_active = true
@@ -57,7 +57,7 @@ class Studybuddy {
             i.study_buddy_types = studyTypes.map(a => a.name);
             return i;
 
-        }));
+        })).catch((error) => console.log("error", error));
 
         return users;
     }
@@ -140,7 +140,7 @@ class Studybuddy {
             usersWithType = await Promise.all(user.map(async u => {
                 const res = await getManyToManyData('study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id', u.id);
                 u.study_buddy_types = res.map(r => r.name);
-            }));
+            })).catch((error) => console.log("error", error));
         }
 
 

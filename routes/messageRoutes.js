@@ -17,12 +17,15 @@ router.post('/:username/send', authenticateJWT, isMustBeLoggedIn, async (req, re
     try {
 
         const { msg } = req.body
+
         if (typeof (msg) !== 'string') {
             throw new BadRequestError("not a valid type")
         }
+        console.log('msg is', msg)
         const { username } = req.params
         console.log('in msg route', msg, username, res.locals.user.id)
         const result = await Message.sendMsg(res.locals.user.id, username, msg)
+
         return res.status(201).json(result)
 
     } catch (e) {

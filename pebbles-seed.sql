@@ -41,11 +41,22 @@ VALUES ('English'),('Japanese');
 INSERT INTO language_levels(name)
 VALUES ('Beginner'),('Intermediate'),('Advanced');
 
-INSERT INTO users(username, password,email,role,sign_up_date,last_login_date,language_preference, gender_id) /*password is asdfasdf*/
-VALUES ('ktoo','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanaka@gmail.com','admin','2023-05-01','2023-05-01',1,1),
- ('hello','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaa@gmail.com','regular','2023-05-01','2023-05-01',1,1),
- ('blockMe','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaaa@gmail.com','regular','2023-05-01','2023-05-01',1,1),
-  ('newUser','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaaaa@gmail.com','regular','2023-05-01','2023-05-01',1,1);
+INSERT INTO users(username, password,email,role,sign_up_date,last_login_date,language_preference, gender_id, 
+study_buddy_active,
+study_buddy_timezone_id,
+study_buddy_native_language_id,
+study_buddy_learning_language_id,
+study_buddy_language_level_id,
+study_buddy_bio,
+study_buddy_purpose) /*password is asdfasdf*/
+VALUES ('ktoo','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanaka@gmail.com','admin','2023-05-01','2023-05-01',1,1,
+true,1,1,2,1,'bio ktoo','purpose ktoo'),
+ ('hello','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaa@gmail.com','regular','2023-05-01','2023-05-01',1,1,
+ true,2,2,1,1,'hello bio','hello purpose'),
+ ('blockMe','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaaa@gmail.com','regular','2023-05-01','2023-05-01',1,1,
+ true,3,1,2,2,'blockme bio','hello purpose'),
+  ('newUser','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaaaa@gmail.com','regular','2023-05-01','2023-05-01',1,1,
+  true,4,2,1,3,'newuser bio','newuser purpose');
 
 INSERT INTO messages (from_user_id,to_user_id,msg, sent_at, read) 
 VALUES (1,2,'first message', '2023-06-07 15:30:00+00:00', true), 

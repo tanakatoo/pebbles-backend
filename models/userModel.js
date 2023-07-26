@@ -269,7 +269,10 @@ class User {
                WHERE ${query} = $1`,
             [queryData],
         );
-
+        console.log('query is', `SELECT username,email,id
+FROM users
+WHERE ${query} = $1`,
+            [queryData])
         const user = result.rows[0];
         return user;
 

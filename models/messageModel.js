@@ -75,7 +75,7 @@ class Message {
         INNER JOIN users uFrom on uFrom.id=subquery.from_user_id
         INNER JOIN users uTo on uTo.id=subquery.to_user_id
         WHERE rn = 1
-        ORDER BY read ASC, sent_at`, [id]
+        ORDER BY read DESC, sent_at DESC`, [id]
         )
 
         return latestMessageList.rows;
@@ -96,7 +96,7 @@ class Message {
 
         // //check if I blocked user
         // //should not throw error as there is no ui to display messages of blocked user
-        // const iBlockedUser = await blockedUser(user_id, id, user_id)
+        const iBlockedUser = await blockedUser(user_id, id, user_id)
 
         //get a list of users that the logged in user has messages for and filter out those that the user has blocked
         //this is so users can block more users

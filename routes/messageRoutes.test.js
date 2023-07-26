@@ -250,7 +250,7 @@ describe("GET /messages/:username/", function () {
             .set("authorization", `Bearer ${process.env.u1Token}`);
 
         expect(resp.body.error.message).toEqual("blocked");
-
+        // expect(resp.body).toEqual([]);
     });
 
 

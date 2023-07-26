@@ -11,6 +11,7 @@ types.setTypeParser(1114, function (stringValue) {
 });
 
 let db
+
 if (process.env.NODE_ENV === "production") {
     db = new Client({
         connectionString: getDatabaseUri(),
@@ -23,8 +24,10 @@ if (process.env.NODE_ENV === "production") {
     db = new Client({
         connectionString: getDatabaseUri()
     });
+
 }
 
 db.connect();
+
 
 module.exports = db;

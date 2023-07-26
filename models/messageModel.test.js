@@ -18,181 +18,181 @@ afterAll(commonAfterAll);
 
 /************************************** sendMsg */
 
-// describe("sendMsg", function () {
+describe("sendMsg", function () {
 
-//     test("works", async function () {
+    test("works", async function () {
 
-//         console.log('process env u1Id', process.env.u1Id)
-//         let message = await Message.sendMsg(process.env.u1Id, 'testuser2', 'Hi, this is testuser1');
+        console.log('process env u1Id', process.env.u1Id)
+        let message = await Message.sendMsg(process.env.u1Id, 'testuser2', 'Hi, this is testuser1');
 
-//         expect(message.msg).toEqual('Hi, this is testuser1');
-//         expect(message.from_user_id).toEqual(+process.env.u1Id);
-//         expect(message.to_user_id).toEqual(+process.env.u2Id);
+        expect(message.msg).toEqual('Hi, this is testuser1');
+        expect(message.from_user_id).toEqual(+process.env.u1Id);
+        expect(message.to_user_id).toEqual(+process.env.u2Id);
 
-//     });
+    });
 
-//     test("error with not found username", async function () {
-//         try {
-//             let message = await Message.sendMsg(process.env.u1Id, 'testuser23', 'Hi, this is testuser1');
+    test("error with not found username", async function () {
+        try {
+            let message = await Message.sendMsg(process.env.u1Id, 'testuser23', 'Hi, this is testuser1');
 
-//         } catch (err) {
-//             expect(err instanceof NotFoundError).toBeTruthy();
-//         }
-//     });
+        } catch (err) {
+            expect(err instanceof NotFoundError).toBeTruthy();
+        }
+    });
 
-//     test("error with not found userid", async function () {
-//         try {
-//             let message = await Message.sendMsg('23', 'testuser23', 'Hi, this is testuser1');
+    test("error with not found userid", async function () {
+        try {
+            let message = await Message.sendMsg('23', 'testuser23', 'Hi, this is testuser1');
 
-//         } catch (err) {
-//             expect(err instanceof NotFoundError).toBeTruthy();
-//         }
-//     });
+        } catch (err) {
+            expect(err instanceof NotFoundError).toBeTruthy();
+        }
+    });
 
-//     test("error with no message", async function () {
-//         try {
-//             let message = await Message.sendMsg(process.env.u1Id, 'testuser2');
+    test("error with no message", async function () {
+        try {
+            let message = await Message.sendMsg(process.env.u1Id, 'testuser2');
 
-//         } catch (err) {
+        } catch (err) {
 
-//             expect('null value in column "msg" violates not-null constraint').toBeTruthy();
-//         }
-//     });
+            expect('null value in column "msg" violates not-null constraint').toBeTruthy();
+        }
+    });
 
-//     test("cannot send if user is blocked by logged in user", async function () {
+    test("cannot send if user is blocked by logged in user", async function () {
 
-//         const block = await db.query(`
-//         INSERT INTO blocked_users (user_id,blocked_user_id) values
-//         (${+process.env.u1Id},${+process.env.u2Id})`)
+        const block = await db.query(`
+        INSERT INTO blocked_users (user_id,blocked_user_id) values
+        (${+process.env.u1Id},${+process.env.u2Id})`)
 
-//         try {
-//             let message = await Message.sendMsg(process.env.u1Id, 'testuser2', 'Hi, this is testuser1');
-//         } catch (e) {
+        try {
+            let message = await Message.sendMsg(process.env.u1Id, 'testuser2', 'Hi, this is testuser1');
+        } catch (e) {
 
-//             expect(e instanceof ExpressError).toBeTruthy();
-//         }
-
-
-//     });
+            expect(e instanceof ExpressError).toBeTruthy();
+        }
 
 
-//     test("cannot send to user who blocked you", async function () {
+    });
 
 
-//         const block = await db.query(`
-//         INSERT INTO blocked_users (user_id,blocked_user_id) values
-//         (${+process.env.u2Id},${+process.env.u1Id})`)
+    test("cannot send to user who blocked you", async function () {
 
 
-//         try {
-//             let message = await Message.sendMsg(process.env.u1Id, 'testuser2', 'Hi, this is testuser1');
-//         } catch (e) {
-
-//             expect(e instanceof ExpressError).toBeTruthy();
-//         }
+        const block = await db.query(`
+        INSERT INTO blocked_users (user_id,blocked_user_id) values
+        (${+process.env.u2Id},${+process.env.u1Id})`)
 
 
-//     });
-// });
+        try {
+            let message = await Message.sendMsg(process.env.u1Id, 'testuser2', 'Hi, this is testuser1');
+        } catch (e) {
+
+            expect(e instanceof ExpressError).toBeTruthy();
+        }
 
 
-// describe("getLatestMessageList", function () {
+    });
+});
 
-//     test("works", async function () {
 
-//         await db.query(
-//             `INSERT INTO messages (from_user_id,to_user_id,msg)
-//             VALUES(${process.env.u1Id},${process.env.u2Id},'from 1 to 2'),
-//             (${process.env.u3Id},${process.env.u1Id},'from 3 to 1')
-//             `
-//         )
+describe("getLatestMessageList", function () {
 
-//         let message = await Message.getLatestMessageList(process.env.u1Id);
-//         expect(message.length).toEqual(2);
+    test("works", async function () {
 
-//     });
+        await db.query(
+            `INSERT INTO messages (from_user_id,to_user_id,msg)
+            VALUES(${process.env.u1Id},${process.env.u2Id},'from 1 to 2'),
+            (${process.env.u3Id},${process.env.u1Id},'from 3 to 1')
+            `
+        )
 
-//     test("error with invalid id", async function () {
+        let message = await Message.getLatestMessageList(process.env.u1Id);
+        expect(message.length).toEqual(2);
 
-//         await db.query(
-//             `INSERT INTO messages (from_user_id,to_user_id,msg)
-//             VALUES(${process.env.u1Id},${process.env.u2Id},'from 1 to 2'),
-//             (${process.env.u3Id},${process.env.u1Id},'from 3 to 1')
-//             `
-//         )
-//         try {
-//             let message = await Message.getLatestMessageList(23);
-//         } catch (e) {
-//             console.log(err)
-//             expect(err instanceof NotFoundError).toBeTruthy();
-//         }
+    });
 
-//     });
+    test("error with invalid id", async function () {
 
-//     test("error with no id", async function () {
+        await db.query(
+            `INSERT INTO messages (from_user_id,to_user_id,msg)
+            VALUES(${process.env.u1Id},${process.env.u2Id},'from 1 to 2'),
+            (${process.env.u3Id},${process.env.u1Id},'from 3 to 1')
+            `
+        )
+        try {
+            let message = await Message.getLatestMessageList(23);
+        } catch (e) {
+            console.log(err)
+            expect(err instanceof NotFoundError).toBeTruthy();
+        }
 
-//         await db.query(
-//             `INSERT INTO messages (from_user_id,to_user_id,msg)
-//             VALUES(${process.env.u1Id},${process.env.u2Id},'from 1 to 2'),
-//             (${process.env.u3Id},${process.env.u1Id},'from 3 to 1')
-//             `
-//         )
-//         try {
-//             let message = await Message.getLatestMessageList();
-//         } catch (e) {
-//             console.log(err)
-//             expect(err instanceof NotFoundError).toBeTruthy();
-//         }
+    });
 
-//     });
-// });
+    test("error with no id", async function () {
+
+        await db.query(
+            `INSERT INTO messages (from_user_id,to_user_id,msg)
+            VALUES(${process.env.u1Id},${process.env.u2Id},'from 1 to 2'),
+            (${process.env.u3Id},${process.env.u1Id},'from 3 to 1')
+            `
+        )
+        try {
+            let message = await Message.getLatestMessageList();
+        } catch (e) {
+            console.log(err)
+            expect(err instanceof NotFoundError).toBeTruthy();
+        }
+
+    });
+});
 
 describe("getMessages", function () {
 
-    // test("works", async function () {
+    test("works", async function () {
 
-    //     await db.query(
-    //         `INSERT INTO messages (from_user_id,to_user_id,msg)
-    //     VALUES(${process.env.u1Id},${process.env.u2Id},'from 1 to 2'),
-    //     (${process.env.u1Id},${process.env.u2Id},'from 1 to 2 v2'),
-    //     (${process.env.u1Id},${process.env.u2Id},'from 1 to 2 v3'),
-    //     (${process.env.u1Id},${process.env.u2Id},'from 1 to 2 v4'),
-    //     (${process.env.u3Id},${process.env.u1Id},'from 3 to 1')
-    //     `
-    //     )
+        await db.query(
+            `INSERT INTO messages (from_user_id,to_user_id,msg)
+        VALUES(${process.env.u1Id},${process.env.u2Id},'from 1 to 2'),
+        (${process.env.u1Id},${process.env.u2Id},'from 1 to 2 v2'),
+        (${process.env.u1Id},${process.env.u2Id},'from 1 to 2 v3'),
+        (${process.env.u1Id},${process.env.u2Id},'from 1 to 2 v4'),
+        (${process.env.u3Id},${process.env.u1Id},'from 3 to 1')
+        `
+        )
 
-    //     let message = await Message.getMessages('testuser2', process.env.u1Id, 'testuser1');
-    //     expect(message.length).toEqual(4);
+        let message = await Message.getMessages('testuser2', process.env.u1Id, 'testuser1');
+        expect(message.length).toEqual(4);
 
-    // });
+    });
 
-    // test("works for messaging a new user (no messages associated with it, returning only avatar and username)", async function () {
+    test("works for messaging a new user (no messages associated with it, returning only avatar and username)", async function () {
 
 
-    //     let message = await Message.getMessages('testuser2', process.env.u1Id, 'testuser1');
-    //     expect(message.length).toEqual(1);
-    //     expect(message[0].to).toEqual('testuser2')
+        let message = await Message.getMessages('testuser2', process.env.u1Id, 'testuser1');
+        expect(message.length).toEqual(1);
+        expect(message[0].to).toEqual('testuser2')
 
-    // });
+    });
 
-    // test("error when invalid username", async function () {
+    test("error when invalid username", async function () {
 
-    //     await db.query(
-    //         `INSERT INTO messages (from_user_id,to_user_id,msg)
-    //     VALUES(${process.env.u1Id},${process.env.u2Id},'from 1 to 2'),
-    //     (${process.env.u1Id},${process.env.u2Id},'from 1 to 2 v2'),
-    //     (${process.env.u1Id},${process.env.u2Id},'from 1 to 2 v3'),
-    //     (${process.env.u1Id},${process.env.u2Id},'from 1 to 2 v4'),
-    //     (${process.env.u3Id},${process.env.u1Id},'from 3 to 1')
-    //     `
-    //     )
-    //     try {
-    //         let message = await Message.getMessages('testuser23', process.env.u1Id, 'testuser1');
-    //     } catch (e) {
+        await db.query(
+            `INSERT INTO messages (from_user_id,to_user_id,msg)
+        VALUES(${process.env.u1Id},${process.env.u2Id},'from 1 to 2'),
+        (${process.env.u1Id},${process.env.u2Id},'from 1 to 2 v2'),
+        (${process.env.u1Id},${process.env.u2Id},'from 1 to 2 v3'),
+        (${process.env.u1Id},${process.env.u2Id},'from 1 to 2 v4'),
+        (${process.env.u3Id},${process.env.u1Id},'from 3 to 1')
+        `
+        )
+        try {
+            let message = await Message.getMessages('testuser23', process.env.u1Id, 'testuser1');
+        } catch (e) {
 
-    //         expect(e instanceof NotFoundError).toBeTruthy();
-    //     }
-    // });
+            expect(e instanceof NotFoundError).toBeTruthy();
+        }
+    });
 
     test("sets flag to 'read' for logged in user", async function () {
 

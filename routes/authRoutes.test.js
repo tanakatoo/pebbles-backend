@@ -88,8 +88,11 @@ describe("POST /auth/register", function () {
                 lang: "EN"
             });
         expect(resp.statusCode).toEqual(201);
-        expect(resp.body).toEqual(expect.any(String));
-
+        expect(resp.body).toEqual({
+            "token": expect.any(String),
+            "user": expect.any(Object)
+        });
+        expect(resp.body.user.username).toEqual("newOne")
     });
 
     test("bad request with missing fields", async function () {
@@ -168,7 +171,7 @@ describe("POST /auth/set-password", function () {
         const resp = await request(app)
             .post("/auth/change-password")
             .send({
-                username: "usertest1@test.com",
+                username: "testuser1@test.com",
                 lang: "EN"
             });
         expect(resp.statusCode).toEqual(201);
@@ -182,7 +185,7 @@ describe("POST /auth/set-password", function () {
         const resp = await request(app)
             .post("/auth/change-password")
             .send({
-                username: "usertest1",
+                username: "testuser1",
                 lang: "EN"
             });
         expect(resp.statusCode).toEqual(201);

@@ -60,11 +60,13 @@ router.post('/change-password', async (req, res, next) => {
         const { username, lang } = req.body
         //see if identifier is an email
         let user
+
         if (validatorPkg.isEmail(username)) {
             user = await User.findUser(null, username)
         } else {
             user = await User.findUser(username, null)
         }
+
         if (user) {
 
             const token = generateForgotPasswordToken(user.id)
