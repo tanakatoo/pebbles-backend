@@ -40,3 +40,14 @@ VALUES ('English'),('Japanese');
 
 INSERT INTO language_levels(name)
 VALUES ('Beginner'),('Intermediate'),('Advanced');
+
+INSERT INTO users(username, password,email,role,sign_up_date,last_login_date,language_preference, gender_id, 
+study_buddy_active,
+study_buddy_timezone_id,
+study_buddy_native_language_id,
+study_buddy_learning_language_id,
+study_buddy_language_level_id,
+study_buddy_bio,
+study_buddy_purpose) /*password is asdfasdf*/
+VALUES ('jim','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','jim@test.com','regular','2023-05-01','2023-05-01',1,1,
+true,1,1,2,1,'bio jim','purpose jim')
