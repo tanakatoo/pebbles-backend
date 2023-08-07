@@ -12,7 +12,7 @@ const Studybuddy = require('../models/studybuddyModel')
  * http://localhost:3001/study-buddies/search?page=1&word=&language_level=&gender=&timezone=&age=18-25
  * returns [{study buddy properties}]
  */
-router.get('/search', authenticateJWT, async (req, res, next) => {
+router.get('/search', async (req, res, next) => {
     try {
 
         const { page, word, language_level, gender, timezone, age, type, native_lang, learning_lang } = req.query

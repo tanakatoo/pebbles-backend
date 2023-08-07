@@ -26,7 +26,7 @@ class Studybuddy {
      */
 
     static async getList(page) {
-        console.log('going to get study buddies i model ')
+
         const numToDisplayPerPage = 30;
         const buddyBaseQuery = `${baseQuery} 
             WHERE u.study_buddy_active = true
@@ -59,6 +59,7 @@ class Studybuddy {
 
         })).catch((error) => console.log("error", error));
 
+        console.log('users by activate date', users)
         return users;
     }
 

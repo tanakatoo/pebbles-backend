@@ -18,6 +18,12 @@ async function commonBeforeAll() {
     await db.query("DELETE FROM countries");
     await db.query("DELETE FROM states");
     await db.query("DELETE FROM messages");
+    await db.query("DELETE FROM study_buddy_types_users");
+    await db.query("DELETE FROM goals_users");
+    await db.query("DELETE FROM blocked_users");
+    await db.query("DELETE FROM saved");
+
+
 
     await User.register(
         {

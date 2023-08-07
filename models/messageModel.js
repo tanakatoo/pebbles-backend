@@ -49,35 +49,60 @@ class Message {
          **/
 
     static async getLatestMessageList(id) {
-
+        console.log('getting msg list')
         //get a list of users that the logged in user has messages for and filter out those that the user has blocked
         //this is so users can block more users
         const latestMessageList = await db.query(
-            `SELECT uTo.avatar as toAvatar, uFrom.avatar as fromAvatar, uFrom.username as from ,uTo.username as to, subquery.from_user_id, subquery.to_user_id, subquery.msg, subquery.sent_at, subquery.read
+            `SELECT uTo.avatar as toAvatar, 
+                    uFrom.avatar as fromAvatar, 
+                    uFrom.username as from ,
+                    uTo.username as to, 
+                    subquery.from_user_id, 
+                    subquery.to_user_id, 
+                    subquery.msg, 
+                    subquery.sent_at, 
+                    subquery.read
             FROM(
                 SELECT 
-            from_user_id, to_user_id, msg, sent_at, read,
-                ROW_NUMBER() OVER(PARTITION BY 
-              CASE WHEN from_user_id = $1 THEN to_user_id
-                   ELSE from_user_id
-              END
-              ORDER BY sent_at DESC) AS rn
-        FROM(SELECT * FROM messages 
-            WHERE 
-            to_user_id not in (SELECT blocked_user_id 
+                    from_user_id, to_user_id, msg, sent_at, read,
+                    ROW_NUMBER() OVER
+                        (PARTITION BY 
+                            CASE 
+                                WHEN from_user_id = $1 THEN to_user_id
+                                ELSE from_user_id
+                            END
+                            ORDER BY
+                            CASE
+                                WHEN to_user_id = $1 THEN read END ASC,
+                                
+                                sent_at DESC
+                         ) 
+                    AS rn
+                FROM
+                    (SELECT * FROM messages 
+                    WHERE 
+                    to_user_id not in 
+                        (SELECT blocked_user_id 
+                        FROM blocked_users 
+                        WHERE user_id = $1) AND 
+                            from_user_id not in 
+                                (SELECT blocked_user_id 
                                 FROM blocked_users 
-                                WHERE user_id = $1) AND 
-            from_user_id not in (SELECT blocked_user_id 
-                            FROM blocked_users 
-                            WHERE user_id = $1)) as subsubquery
-          WHERE $1 IN(from_user_id, to_user_id)
-        ) AS subquery
+                                WHERE user_id = $1)) 
+                    as subsubquery
+                WHERE $1 IN(from_user_id, to_user_id)
+            ) AS subquery
         INNER JOIN users uFrom on uFrom.id=subquery.from_user_id
         INNER JOIN users uTo on uTo.id=subquery.to_user_id
         WHERE rn = 1
-        ORDER BY read DESC, sent_at DESC`, [id]
+        ORDER BY
+            CASE 
+                WHEN (subquery.to_user_id = $1 AND subquery.read = false) THEN subquery.read 
+            END ASC,
+           
+        subquery.sent_at DESC`, [id]
         )
-
+        console.log(latestMessageList.rows)
         return latestMessageList.rows;
     }
 
