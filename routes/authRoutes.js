@@ -46,6 +46,39 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
+//login as test user for employers
+router.post('/login/testuser', async (req, res, next) => {
+    try {
+        console.log('got in here')
+        //validate data
+
+        // const validator = jsonschema.validate(req.body, userLoginSchema)
+        // if (!validator.valid) {
+
+        //     const errs = validator.errors.map(e => e.stack)
+        //     throw new BadRequestError(errs)
+        // }
+        // const { username, password } = req.body
+        const username = 'hello'
+        const password = 'asdfasdf'
+        //see if identifier is an email
+        let userToken
+        // if (validatorPkg.isEmail(username)) {
+        //     userToken = await User.login(null, username, password)
+        // } else {
+        userToken = await User.login(username, null, password)
+        // }
+        //return token
+        const token = generateToken(userToken.id, userToken.username, userToken.role)
+
+        //get private profile and return that
+        const user = await User.getPrivate(userToken.username)
+        return res.status(201).json({ token, user })
+    } catch (e) {
+        return next(e)
+    }
+});
+
 //done testing
 router.post('/change-password', async (req, res, next) => {
     try {
