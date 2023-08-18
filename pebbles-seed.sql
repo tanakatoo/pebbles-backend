@@ -50,20 +50,20 @@ study_buddy_language_level_id,
 study_buddy_bio,
 study_buddy_purpose) /*password is asdfasdf*/
 VALUES ('ktoo','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanaka@gmail.com','admin','2023-05-01','2023-05-01',1,1,
-true,1,1,2,1,'bio ktoo','purpose ktoo'),
- ('hello','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaa@gmail.com','regular','2023-05-01','2023-05-01',1,1,
- true,2,2,1,1,'hello bio','hello purpose'),
- ('blockMe','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaaa@gmail.com','regular','2023-05-01','2023-05-01',1,1,
- true,3,1,2,2,'blockme bio','hello purpose'),
-  ('newUser','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','karmen.tanakaaaa@gmail.com','regular','2023-05-01','2023-05-01',1,1,
-  true,4,2,1,3,'newuser bio','newuser purpose');
+true,1,1,2,1,'This is the bio for ktoo.','This is the purpose for ktoo'),
+ ('hello','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','hello@test.com','regular','2023-05-01','2023-05-01',1,1,
+ true,2,2,1,1,'This is the bio for hello.','This is the purpose for hello.'),
+ ('blockMe','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','blockme@test.com','regular','2023-05-01','2023-05-01',1,1,
+ true,3,1,2,2,'This is the bio for blockme','This is the purpose for blockme.'),
+  ('newUser','$2b$12$LCkeEtenLBV490vZDhi6gOwA67qVD9UfYyhdVSkKdqvvQAGDWDHf6','newuser@test.com','regular','2023-05-01','2023-05-01',1,1,
+  true,4,2,1,3,'This is the bio for newUser.','This is the purpose for newUser.');
 
 INSERT INTO messages (from_user_id,to_user_id,msg, sent_at, read) 
-VALUES (1,2,'first message', '2023-06-07 15:30:00+00:00', true), 
-(2,1,'2nd most recent one reply', '2023-06-08 15:30:00+00:00', false),
-(1,2,'the most recent one reply to second one', '2023-06-09 15:30:00+00:00', false),
-(2,3,'from 2 to 3 first msg','2023-06-04 15:30:00+00:00', true),
-(3,2, 'from 3-2 latest message','2023-06-08 15:30:00+00:00', true);
+VALUES (1,2,'This is the first message.', '2023-06-07 15:30:00+00:00', true), 
+(2,1,'This is the 2nd message.', '2023-06-08 15:30:00+00:00', false),
+(1,2,'This is the most recent one.', '2023-06-09 15:30:00+00:00', false),
+(2,3,'Message from hello to blockMe','2023-06-04 15:30:00+00:00', true),
+(3,2, 'Message from blockMe to hello. This is the latest message.','2023-06-08 15:30:00+00:00', true);
 
 INSERT INTO blocked_users (user_id,blocked_user_id)
 VALUES (1,3), (2,3);

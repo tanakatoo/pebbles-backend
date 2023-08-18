@@ -80,6 +80,7 @@ class Studybuddy {
         index++;
         values.push(true);
 
+        console.log('in searchin for a word', word)
         if (word) {
             filters += word ? ` AND (u.study_buddy_bio ILIKE $2 OR 
                 u.username ILIKE $2 OR
@@ -136,7 +137,7 @@ class Studybuddy {
         //get study buddy types as array and return
         let usersWithType = [];
         if (user.length > 0) {
-            s
+
             usersWithType = await Promise.all(user.map(async u => {
                 const res = await getManyToManyData('study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id', u.id);
                 u.study_buddy_types = res.map(r => r.name);
