@@ -49,26 +49,13 @@ router.post('/login', async (req, res, next) => {
 //login as test user for employers
 router.post('/login/testuser', async (req, res, next) => {
     try {
-        console.log('got in here')
-        //validate data
 
-        // const validator = jsonschema.validate(req.body, userLoginSchema)
-        // if (!validator.valid) {
-
-        //     const errs = validator.errors.map(e => e.stack)
-        //     throw new BadRequestError(errs)
-        // }
-        // const { username, password } = req.body
         const username = 'hello'
         const password = 'asdfasdf'
-        //see if identifier is an email
+
         let userToken
-        // if (validatorPkg.isEmail(username)) {
-        //     userToken = await User.login(null, username, password)
-        // } else {
         userToken = await User.login(username, null, password)
-        // }
-        //return token
+
         const token = generateToken(userToken.id, userToken.username, userToken.role)
 
         //get private profile and return that
@@ -112,7 +99,7 @@ router.post('/change-password', async (req, res, next) => {
                 lang,
                 `${process.env.DOMAIN_URL}/reset-password?token=${token}`
             )
-            console.log('user is found so sending email')
+
             return res.status(201).json('completed')
         } else {
             throw new NotFoundError("NOT_FOUND")
@@ -139,13 +126,12 @@ router.post('/set-password', async (req, res, next) => {
         const { password, lang, token } = req.body
         //check that we can get id from token
         const id = jwt.verify(token, SECRET_KEY).id
-        console.log('got id from token', id)
+
 
         //set password in db
-        console.log('estting password,', id, password)
+
         const passwordSetUser = await User.setPassword(id, password)
 
-        console.log('user is', passwordSetUser === true)
         if (passwordSetUser) {
             //return token
             const token = generateToken(passwordSetUser.id, passwordSetUser.username, passwordSetUser.role)

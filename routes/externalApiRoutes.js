@@ -56,7 +56,7 @@ router.get('/select-location', async (req, res, next) => {
             throw new BadRequestError(errs)
         }
         const { id, sessionToken } = req.query
-        console.log('session token for the first query', sessionToken)
+
         // const resultEN = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&fields=address_component&language=EN&key=${process.env.GOOGLE_API_KEY}`)
         // const resultJA = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&fields=address_component&language=JA&key=${process.env.GOOGLE_API_KEY}`)
         const resultEN = await client.placeDetails({
@@ -79,7 +79,7 @@ router.get('/select-location', async (req, res, next) => {
             timeout: 1000 // Optional timeout value in milliseconds
         });
         //parse and return full names of location in both languages
-        console.log(resultEN.data.result, resultJA.data.result)
+
         let city
         let state
         let country
@@ -89,26 +89,26 @@ router.get('/select-location', async (req, res, next) => {
         resultEN.data.result.address_components.map(l => {
             if (l.types.find(ele => ele === 'locality')) {
                 //if locality is the type then
-                console.log(l.long_name)
+
                 city = l.long_name
             } else if (l.types.find(ele => ele === 'administrative_area_level_1')) {
-                console.log(l.long_name)
+
                 state = l.long_name
             } else if (l.types.find(ele => ele === 'country')) {
-                console.log(l.long_name)
+
                 country = l.long_name
             }
         })
         resultJA.data.result.address_components.map(l => {
             if (l.types.find(ele => ele === 'locality')) {
                 //if locality is the type then
-                console.log(l.long_name)
+
                 city_ja = l.long_name
             } else if (l.types.find(ele => ele === 'administrative_area_level_1')) {
-                console.log(l.long_name)
+
                 state_ja = l.long_name
             } else if (l.types.find(ele => ele === 'country')) {
-                console.log(l.long_name)
+
                 country_ja = l.long_name
             }
         })

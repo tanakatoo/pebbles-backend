@@ -23,7 +23,7 @@ class Message {
     static async sendMsg(id, username, msg) {
 
         const user_id = await getUserID(username)
-        console.log('in msg model to user id', user_id, id, username, msg)
+
         //did user block me
         //returns false, but it throws error if logged user is blocked
         const userBlockedMe = await blockedUser(id, user_id, id)
@@ -36,7 +36,7 @@ class Message {
             `INSERT INTO messages (from_user_id, to_user_id,msg)
             VALUES ($1,$2,$3) RETURNING from_user_id, to_user_id, msg, sent_at`, [id, user_id, msg]
         )
-        console.log('insert already, returning this', result)
+
         return result.rows[0]
     }
 
@@ -49,7 +49,7 @@ class Message {
          **/
 
     static async getLatestMessageList(id) {
-        console.log('getting msg list')
+
         //get a list of users that the logged in user has messages for and filter out those that the user has blocked
         //this is so users can block more users
         const latestMessageList = await db.query(
@@ -102,7 +102,7 @@ class Message {
            
         subquery.sent_at DESC`, [id]
         )
-        console.log(latestMessageList.rows)
+
         return latestMessageList.rows;
     }
 

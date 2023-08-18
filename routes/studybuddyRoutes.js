@@ -16,12 +16,12 @@ router.get('/search', async (req, res, next) => {
     try {
 
         const { page, word, language_level, gender, timezone, age, type, native_lang, learning_lang } = req.query
-        console.log('we got lanlevel', language_level)
+
         const result = await Studybuddy.searchList(page, word, language_level, gender, timezone, age, type, native_lang, learning_lang)
         return res.status(200).json(result)
 
     } catch (e) {
-        console.log('in search study buddy routes,', e)
+
         return next(e)
     }
 })
@@ -40,7 +40,7 @@ router.get('/:page', async (req, res, next) => {
         let { page } = req.params;
 
         const result = await Studybuddy.getList(page);
-        console.log('result is', result)
+
         return res.status(200).json(result);
 
     } catch (e) {

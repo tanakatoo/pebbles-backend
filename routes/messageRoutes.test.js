@@ -26,7 +26,7 @@ describe("POST /messages/:username/send", function () {
                 msg: "user 1 to user 2",
             })
             .set("authorization", `Bearer ${process.env.u1Token}`);
-        console.log('response is', resp.body)
+
         expect(resp.body.from_user_id).toEqual(+process.env.u1Id);
         expect(resp.body.to_user_id).toEqual(+process.env.u2Id);
         expect(resp.body.msg).toEqual('user 1 to user 2');

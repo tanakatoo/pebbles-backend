@@ -47,7 +47,7 @@ describe("getList", function () {
         )
 
         let list = await Studybuddy.getList(1);
-        console.log(list)
+
         expect(list.length).toEqual(1);
         expect(list[0].learning_language).toEqual('Japanese');
         expect(list[0].study_buddy_types).toEqual(['StudyBuddy', 'LanguageExchange'])
@@ -103,7 +103,7 @@ describe("getList", function () {
         )
 
         let list = await Studybuddy.getList(1);
-        console.log(list)
+
         expect(list.length).toEqual(1);
         expect(list[0].learning_language).toEqual('Japanese');
 
@@ -527,7 +527,7 @@ describe("searchList", function () {
 
         let list = await Studybuddy.searchList(1, '', [], [], [], [], ['StudyBuddy'], [], []);
 
-        console.log(list)
+
         expect(list.length).toEqual(1);
         expect(list[0].learning_language).toEqual('Japanese');
 

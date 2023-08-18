@@ -2,7 +2,7 @@ const db = require("../db");
 const { NotFoundError } = require("../error")
 
 async function getUserID(username) {
-    console.log('checking username,', username)
+
     //get user id of the user to send message to
     const userResult = await db.query(`SELECT id FROM users WHERE username=$1`, [username])
 

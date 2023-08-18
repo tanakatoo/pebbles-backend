@@ -8,7 +8,7 @@ let client = new SendMailClient({ url, token });
 //sendEmail("karmen.tanaka@gmail.com", "Karmen", "PASSWORD_RESET", "EN", "www.pebblescommunity.com", "testing email")
 function sendForgotPassword(to, name, type, lang, link = '', ...extras) {
     const text = emailText[type][lang].SUBJECT
-    console.log(to, name, type, lang, link, extras[0])
+
 
     client.sendMail({
         "bounce_address": "bounced@bounce.pebblescommunity.com",

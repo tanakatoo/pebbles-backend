@@ -21,15 +21,15 @@ router.post('/:username/send', authenticateJWT, isMustBeLoggedIn, async (req, re
         if (typeof (msg) !== 'string') {
             throw new BadRequestError("not a valid type")
         }
-        console.log('msg is', msg)
+
         const { username } = req.params
-        console.log('in msg route', msg, username, res.locals.user.id)
+
         const result = await Message.sendMsg(res.locals.user.id, username, msg)
 
         return res.status(201).json(result)
 
     } catch (e) {
-        console.log('in blocked user routes,', e)
+
         return next(e)
     }
 })
@@ -49,7 +49,7 @@ router.get('/', authenticateJWT, isMustBeLoggedIn, async (req, res, next) => {
         return res.status(200).json(result)
 
     } catch (e) {
-        console.log('in blocked user routes,', e)
+
         return next(e)
     }
 })
@@ -69,7 +69,7 @@ router.get('/search', authenticateJWT, isMustBeLoggedIn, async (req, res, next) 
         return res.status(200).json(result)
 
     } catch (e) {
-        console.log('in blocked user routes,', e)
+
         return next(e)
     }
 })
@@ -82,14 +82,14 @@ router.get('/search', authenticateJWT, isMustBeLoggedIn, async (req, res, next) 
  * returns [{from_user_id, to_user_id,msg,sent_at,read}]
  */
 router.get('/:username', authenticateJWT, isMustBeLoggedIn, async (req, res, next) => {
-    console.log('getting message')
+
     try {
         const { username } = req.params
         const result = await Message.getMessages(username, res.locals.user.id, res.locals.user.username)
         return res.status(200).json(result)
 
     } catch (e) {
-        console.log('in blocked user routes,', e)
+
         return next(e)
     }
 })

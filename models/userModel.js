@@ -194,7 +194,7 @@ class User {
             throw new BadRequestError("USERNAME_TAKEN");
         }
 
-        console.log('password is', password)
+
         const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
         const result = await db.query(
@@ -235,10 +235,6 @@ class User {
             [queryData],
         );
 
-        console.log(`SELECT username, role, password, id 
-        FROM users
-           WHERE ${query} = $1`,
-            [queryData])
         const user = result.rows[0];
 
         if (user) {
@@ -269,10 +265,7 @@ class User {
                WHERE ${query} = $1`,
             [queryData],
         );
-        console.log('query is', `SELECT username,email,id
-FROM users
-WHERE ${query} = $1`,
-            [queryData])
+
         const user = result.rows[0];
         return user;
 
@@ -349,7 +342,7 @@ WHERE ${query} = $1`,
             SET raz_reading_level=$1
             WHERE id=$2`, [data, prem_id]
             )
-            console.log('updated results')
+
         }
         return "done"
     }
@@ -405,7 +398,7 @@ WHERE ${query} = $1`,
 
         //if study buddy is active, we have to set the activate date to today
         const currentDate = new Date().toJSON().slice(0, 10);
-        console.log(currentDate)
+
         if (data.study_buddy_active) {
             query += `, study_buddy_activate_date=$${index}`;
             values.push(currentDate);

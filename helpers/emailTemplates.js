@@ -1,7 +1,7 @@
 const emailText = require('../json/emails.json')
 
 function register(name, lang, domain) {
-    console.log('sending link', `${domain}/${emailText.REGISTERED[lang].TEXT3_LINK}`)
+
     const link = `${domain}/${emailText.REGISTERED[lang].TEXT3_LINK}`
     const x = (`
         <table cellspacing="0" cellpadding="0" style="background-color: #F2F2F2; border: 1px solid #eee; width: 100%;">
@@ -62,7 +62,7 @@ function register(name, lang, domain) {
 }
 
 function resetPassword(to, name, type, lang, link, ...extras) {
-    console.log('sending email to this name and this is the link', name, link)
+
 
     const x = (`
         <table cellspacing="0" cellpadding="0" style="background-color: #F2F2F2; border: 1px solid #eee; width: 100%;">

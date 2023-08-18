@@ -627,7 +627,7 @@ describe("update", function () {
         const respGoals = await db.query(
             `SELECT * from goals_users`
         )
-        console.log(respGoals)
+
         expect(respGoals.rows[0].goal_id).toEqual(1);
         expect(respGoals.rows[1].goal_id).toEqual(2);
         expect(respGoals.rows[1].user_id).toEqual(+process.env.u1Id);
@@ -733,7 +733,7 @@ describe("getPrivate", function () {
         )
 
         let user = await User.getPrivate('testuser1');
-        console.log(user)
+
         expect(user.email).toEqual('testuser1@test.com');
         expect(user.study_buddy_types).toEqual(['StudyBuddy']);
     });
@@ -764,7 +764,7 @@ describe("getPublic", function () {
         )
 
         let user = await User.getPublic('testuser1');
-        console.log(user)
+
         expect(user.email).toEqual(undefined);
         expect(user.study_buddy_types).toEqual(['StudyBuddy']);
 

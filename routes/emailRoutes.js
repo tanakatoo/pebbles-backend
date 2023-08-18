@@ -17,7 +17,7 @@ router.post('/', async (req, res, next) => {
     try {
 
         const data = req.body
-        console.log('body data is', data)
+
         if (!data || Object.keys(data).length === 0 || data === '') {
             throw new BadRequestError('no data')
         }

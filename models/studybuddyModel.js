@@ -59,7 +59,6 @@ class Studybuddy {
 
         })).catch((error) => console.log("error", error));
 
-        console.log('users by activate date', users)
         return users;
     }
 
@@ -132,12 +131,12 @@ class Studybuddy {
                 baseQuery + filters + offsetQuery, values
             );
         };
-        console.log('query is', baseQuery + filters + offsetQuery, values)
+
         const user = userRes.rows;
         //get study buddy types as array and return
         let usersWithType = [];
         if (user.length > 0) {
-            console.log('in types')
+            s
             usersWithType = await Promise.all(user.map(async u => {
                 const res = await getManyToManyData('study_buddy_types', 'study_buddy_types_users', 'user_id', 'study_buddy_type_id', u.id);
                 u.study_buddy_types = res.map(r => r.name);

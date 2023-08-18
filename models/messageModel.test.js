@@ -22,7 +22,7 @@ describe("sendMsg", function () {
 
     test("works", async function () {
 
-        console.log('process env u1Id', process.env.u1Id)
+
         let message = await Message.sendMsg(process.env.u1Id, 'testuser2', 'Hi, this is testuser1');
 
         expect(message.msg).toEqual('Hi, this is testuser1');

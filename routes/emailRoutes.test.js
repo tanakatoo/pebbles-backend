@@ -25,7 +25,7 @@ describe("POST /email", function () {
             .send({
                 data: "test sending email",
             });
-        console.log('response is', resp.body)
+
         expect(resp.body).toEqual('sent')
     });
 
@@ -35,7 +35,7 @@ describe("POST /email", function () {
             .send({
 
             });
-        console.log('response is', resp.body)
+
         expect(resp.body.error.message).toEqual('no data')
     });
 

@@ -23,9 +23,9 @@ async function authenticateJWT(req, res, next) {
 
         if (authHeader) {
             const token = authHeader.replace(/^[Bb]earer /, "").trim();
-            console.log('token is before verifiying ', token)
+
             res.locals.user = jwt.verify(token, SECRET_KEY);
-            console.log('verified token', res.locals.user)
+
             const result = await User.getRole(res.locals.user.id)
             res.locals.user.role = result.role
             req.loggedIn = true //if jwt.verify is correct, it will continue down to this line so we set loggedIn = true

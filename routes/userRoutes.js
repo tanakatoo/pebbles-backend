@@ -39,14 +39,14 @@ router.post('/block/:username', authenticateJWT, isMustBeLoggedIn, async (req, r
 
     try {
         const { username } = req.params
-        console.log('username', username)
+
 
         const id = res.locals.user.id
         const result = await User.blockUser(username, id)
         return res.status(201).json(result)
 
     } catch (e) {
-        console.log('in blocked user routes,', e)
+
         return next(e)
     }
 })
@@ -67,7 +67,7 @@ router.get('/blocked', authenticateJWT, isMustBeLoggedIn, async (req, res, next)
         return res.status(200).json(result)
 
     } catch (e) {
-        console.log('in blocked user routes,', e)
+
         return next(e)
     }
 })
@@ -88,7 +88,7 @@ router.get('/contacts', authenticateJWT, isMustBeLoggedIn, async (req, res, next
         return res.status(200).json(result)
 
     } catch (e) {
-        console.log('in blocked user routes,', e)
+
         return next(e)
     }
 })
@@ -131,12 +131,12 @@ router.delete('/unsave/:username', authenticateJWT, isMustBeLoggedIn, async (req
 
 
         const id = res.locals.user.id
-        console.log(user_id, id)
+
         const result = await User.unsaveUser(id, user_id)
         return res.status(204).json(result)
 
     } catch (e) {
-        console.log('in save user routes,', e)
+
         return next(e)
     }
 })
@@ -156,7 +156,7 @@ router.get('/saved-users', authenticateJWT, isMustBeLoggedIn, async (req, res, n
         return res.status(200).json(result)
 
     } catch (e) {
-        console.log('in save user routes,', e)
+
         return next(e)
     }
 })
@@ -174,7 +174,7 @@ router.patch('/:username', authenticateJWT, isCorrectUser, async (req, res, next
             throw new UnauthorizedError
         }
 
-        console.log('info coming into routes ', req.body)
+
         const id = res.locals.user.id
         let user = await User.update(id, req.body)
 
@@ -205,7 +205,7 @@ router.patch('/:username', authenticateJWT, isCorrectUser, async (req, res, next
  * 
  */
 router.get('/search', async (req, res, next) => {
-    console.log('got word, ', req.query.word, req.body)
+
     try {
 
         const results = await User.getSearchUsers(req.query.word)
@@ -229,9 +229,9 @@ router.get('/:username', authenticateJWT, isCorrectUser, async (req, res, next) 
         const loggedIn = req.loggedIn
         const correctUser = req.correctUser
         const username = req.params.username
-        console.log('is it the correct user?', correctUser)
+
         if (loggedIn && correctUser) {
-            console.log('not correct, why?', loggedIn, correctUser)
+
             userData = await User.getPrivate(username)
             userData.myProfile = true
         } else {

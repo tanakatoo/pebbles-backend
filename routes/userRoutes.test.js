@@ -156,7 +156,7 @@ describe("GET /contacts", function () {
         const resp = await request(app)
             .get(`/users/contacts`)
             .set("authorization", `Bearer ${process.env.u1Token}`);
-        console.log(resp.body)
+
         expect(resp.body.length).toEqual(1);
         expect(resp.body[0].username).not.toEqual("testuser3");
     });
@@ -186,7 +186,7 @@ describe("POST /save/:username", function () {
         const resp = await request(app)
             .post(`/users/save/testuser2`)
             .set("authorization", `Bearer ${process.env.u1Token}`);
-        console.log('saving user', resp.body)
+
         expect(resp.status).toEqual(201);
     });
 
@@ -225,7 +225,7 @@ describe("DELETE /unsave/:username", function () {
         const resp = await request(app)
             .delete(`/users/unsave/testuser2`)
             .set("authorization", `Bearer ${process.env.u1Token}`);
-        console.log('unsaving user', resp.body)
+
         expect(resp.status).toEqual(204);
     });
 
@@ -234,7 +234,7 @@ describe("DELETE /unsave/:username", function () {
         const resp = await request(app)
             .delete(`/users/unsave/testuser2`)
             .set("authorization", `Bearer ${process.env.u1Token}`);
-        console.log('unsaving user', resp.body)
+
         expect(resp.status).toEqual(204);
     });
 
@@ -341,7 +341,7 @@ describe("PATCH /users/:username", function () {
             })
             .set("authorization", `Bearer ${process.env.u1Token}`);
 
-        console.log(resp.body)
+
         expect(resp.body.name).toEqual('Testing Me');
         expect(resp.body.country_en).toEqual('Canada');
         expect(resp.body.country_ja).toEqual('カナダ');
@@ -401,7 +401,7 @@ describe("PATCH /users/:username", function () {
             })
             .set("authorization", `Bearer ${process.env.u1Token}`);
 
-        console.log(resp.body)
+
         expect(resp.body.name).toEqual('Testing Me');
         expect(resp.body.country_en).toEqual('Canada');
         expect(resp.body.country_ja).toEqual('カナダ');
@@ -460,7 +460,7 @@ describe("PATCH /users/:username", function () {
             })
             .set("authorization", `Bearer ${process.env.u1Token}`);
 
-        console.log(resp.body)
+
         expect(resp.body.name).toEqual('Testing Me');
         expect(resp.body.country_en).toEqual('Canada');
         expect(resp.body.country_ja).toEqual('カナダ');
@@ -524,7 +524,7 @@ describe("PATCH /users/:username", function () {
             })
             .set("authorization", `Bearer ${process.env.u1Token}`);
 
-        console.log(resp.body)
+
         expect(resp.status).toEqual(500);
 
 
@@ -564,7 +564,7 @@ describe("PATCH /users/:username", function () {
             })
             .set("authorization", `Bearer ${process.env.u1Token}`);
 
-        console.log(resp.body)
+
         expect(resp.status).toEqual(500);
 
 
@@ -603,7 +603,7 @@ describe("PATCH /users/:username", function () {
             })
             .set("authorization", `Bearer ${process.env.u1Token}`);
 
-        console.log(resp.body)
+
         expect(resp.status).toEqual(500);
 
 

@@ -28,7 +28,7 @@ describe("POST /auth/login", function () {
                 username: "testuser1",
                 password: "asdfasdf",
             });
-        console.log(resp.body)
+
         expect(resp.body).toEqual({
             "user": expect.any(Object),
             "token": expect.any(String),
